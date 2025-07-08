@@ -12,6 +12,9 @@ body {
 #visualization-canvas:active {
     cursor: grabbing;
 }
+.fredoka-title {
+    font-family: 'Fredoka One', cursive;
+}
 .control-panel {
     background-color: rgba(31, 41, 55, 0.8); /* Semi-transparent dark gray */
     backdrop-filter: blur(10px);
