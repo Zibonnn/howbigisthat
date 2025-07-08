@@ -1,3 +1,5 @@
+[Live Demo](https://zibonnn.github.io/howbigisthat/)
+
 # How Big Is That
 
 A web app for visualizing and comparing the size of objects in 3D using Three.js.
