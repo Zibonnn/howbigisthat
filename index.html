@@ -14,6 +14,16 @@
     <div id="canvas-container" class="relative">
         <h1 class="h1-title absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
         <canvas id="visualization-canvas"></canvas>
+        <!-- Material Picker and Reset View Button (in-canvas UI) -->
+        <div id="canvas-ui" style="position:absolute;top:16px;right:16px;z-index:52;display:flex;gap:12px;align-items:center;">
+            <button id="reset-view-btn" title="Reset view to isometric" style="background:none;border:none;color:#fff;cursor:pointer;font-size:2rem;padding:0;">
+                <svg width="28" height="28" viewBox="0 0 28 28"><g stroke="#fff" stroke-width="2" fill="none"><polygon points="14,4 24,10 24,20 14,26 4,20 4,10"/><path d="M14 4V14L24 10"/></g></svg>
+            </button>
+            <select id="material-picker" title="Pick a material" style="background:#23232b;color:#fff;border-radius:8px;padding:4px 12px;font-size:1rem;border:1.2px solid #35354a;">
+                <option value="cartoon">Cartoon</option>
+                <option value="gradient">Gradient</option>
+            </select>
+        </div>
     </div>
     <!-- Controls -->
     <div class="sidebar-main mobile-hidden">
@@ -26,10 +36,10 @@
                 </div>
             </div>
             <div class="control-panel">
-                <h3 class="card-title">What do you want to see?</h3>
+                <h3 class="card-title">Display Mode</h3>
                 <div id="display-mode-selector" class="tabs">
-                    <button data-mode="single" class="tab-btn active">One Shape</button>
-                    <button data-mode="arrangement" class="tab-btn">Lots of Shapes</button>
+                    <button data-mode="single" class="tab-btn active">Single Object</button>
+                    <button data-mode="arrangement" class="tab-btn">Arrangement</button>
                 </div>
             </div>
             <div id="arrangement-panel" class="control-panel hidden">
@@ -44,60 +54,24 @@
                 <h3 class="card-title">Pick a Shape</h3>
                 <div id="shape-selector" class="grid grid-cols-3 gap-2">
                     <button data-shape="sphere" class="control-btn p-2 rounded-md active" aria-label="Sphere">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="10" fill="none" stroke="#fff" stroke-width="2"/></svg>
+                        <img src="assets/shapes/sphere.avif" width="32" height="32" alt="Sphere icon" />
                         <div class="shape-label">Sphere</div>
                     </button>
                     <button data-shape="cube" class="control-btn p-2 rounded-md" aria-label="Cube">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="6" y="6" width="20" height="20" rx="3" fill="none" stroke="#fff" stroke-width="2"/></svg>
+                        <img src="assets/shapes/cube.avif" width="32" height="32" alt="Cube icon" />
                         <div class="shape-label">Cube</div>
                     </button>
                     <button data-shape="cylinder" class="control-btn p-2 rounded-md" aria-label="Cylinder">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><ellipse cx="16" cy="10" rx="8" ry="4" fill="none" stroke="#fff" stroke-width="2"/><rect x="8" y="10" width="16" height="12" rx="4" fill="none" stroke="#fff" stroke-width="2"/></svg>
+                        <img src="assets/shapes/cylinder.avif" width="32" height="32" alt="Cylinder icon" />
                         <div class="shape-label">Cylinder</div>
                     </button>
-                    <button data-shape="cone" class="control-btn p-2 rounded-md" aria-label="Cone">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,6 26,26 6,26" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Cone</div>
-                    </button>
                     <button data-shape="pyramid" class="control-btn p-2 rounded-md" aria-label="Pyramid">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,6 28,26 4,26" fill="none" stroke="#fff" stroke-width="2"/><rect x="8" y="22" width="16" height="4" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                        <img src="assets/shapes/pyramid.avif" width="32" height="32" alt="Pyramid icon" />
                         <div class="shape-label">Pyramid</div>
                     </button>
                     <button data-shape="torus" class="control-btn p-2 rounded-md" aria-label="Torus">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><ellipse cx="16" cy="16" rx="10" ry="6" fill="none" stroke="#fff" stroke-width="2"/><ellipse cx="16" cy="16" rx="5" ry="2.5" fill="none" stroke="#fff" stroke-width="2"/></svg>
+                        <img src="assets/shapes/torus.avif" width="32" height="32" alt="Torus icon" />
                         <div class="shape-label">Torus</div>
-                    </button>
-                    <button data-shape="rectangularprism" class="control-btn p-2 rounded-md" aria-label="Rectangular Prism">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="6" y="12" width="20" height="10" rx="2" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Rect Prism</div>
-                    </button>
-                    <button data-shape="triangularprism" class="control-btn p-2 rounded-md" aria-label="Triangular Prism">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="8,24 24,24 16,8" fill="none" stroke="#fff" stroke-width="2"/><rect x="8" y="20" width="16" height="4" fill="none" stroke="#fff" stroke-width="1"/></svg>
-                        <div class="shape-label">Tri Prism</div>
-                    </button>
-                    <button data-shape="octahedron" class="control-btn p-2 rounded-md" aria-label="Octahedron">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 28,16 16,28 4,16" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Octahedron</div>
-                    </button>
-                    <button data-shape="dodecahedron" class="control-btn p-2 rounded-md" aria-label="Dodecahedron">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 28,10 28,22 16,28 4,22 4,10" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Dodecahedron</div>
-                    </button>
-                    <button data-shape="icosahedron" class="control-btn p-2 rounded-md" aria-label="Icosahedron">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,4 28,12 24,28 8,28 4,12" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Icosahedron</div>
-                    </button>
-                    <button data-shape="tetrahedron" class="control-btn p-2 rounded-md" aria-label="Tetrahedron">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><polygon points="16,6 28,26 4,26" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Tetrahedron</div>
-                    </button>
-                    <button data-shape="ellipsoid" class="control-btn p-2 rounded-md" aria-label="Ellipsoid">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><ellipse cx="16" cy="16" rx="12" ry="7" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Ellipsoid</div>
-                    </button>
-                    <button data-shape="capsule" class="control-btn p-2 rounded-md" aria-label="Capsule">
-                        <svg width="32" height="32" viewBox="0 0 32 32"><rect x="10" y="8" width="12" height="16" rx="6" fill="none" stroke="#fff" stroke-width="2"/><ellipse cx="16" cy="8" rx="6" ry="6" fill="none" stroke="#fff" stroke-width="2"/><ellipse cx="16" cy="24" rx="6" ry="6" fill="none" stroke="#fff" stroke-width="2"/></svg>
-                        <div class="shape-label">Capsule</div>
                     </button>
                 </div>
             </div>
@@ -109,16 +83,16 @@
                 </div>
             </div>
             <div class="control-panel">
-                <h3 class="card-title">How Big is Each Shape?</h3>
+                <h3 class="card-title">Base Unit Size</h3>
                 <div class="custom-stepper" id="base-unit-stepper">
-                    <button class="stepper-btn" id="base-unit-minus" aria-label="Make shapes smaller">-</button>
-                    <input type="number" class="stepper-value-input" id="base-unit-value" min="0.05" max="5" step="0.05" value="1.00" title="Size (like 1, 2, 3...)" inputmode="decimal" placeholder="Size" />
-                    <button class="stepper-btn" id="base-unit-plus" aria-label="Make shapes bigger">+</button>
+                    <button class="stepper-btn" id="base-unit-minus" aria-label="Decrease base unit size">-</button>
+                    <input type="number" class="stepper-value-input" id="base-unit-value" min="0.05" max="5" step="0.05" value="1.00" title="Base unit size (like 1, 2, 3...)" inputmode="decimal" placeholder="Base unit size" />
+                    <button class="stepper-btn" id="base-unit-plus" aria-label="Increase base unit size">+</button>
                 </div>
-                <input type="range" id="base-unit-slider" value="1" min="0.05" max="5" step="0.05" title="How big is each shape?">
+                <input type="range" id="base-unit-slider" value="1" min="0.05" max="5" step="0.05" title="Base unit size">
             </div>
             <div class="control-panel">
-                <h3 class="card-title">How Many Shapes?</h3>
+                <h3 class="card-title">Primary Value</h3>
                 <div class="color-row" id="primary-color-row">
                     <button class="color-swatch" data-color="#818CF8" title="Pick this color"></button>
                     <button class="color-swatch" data-color="#F472B6" title="Pick this color"></button>
@@ -130,11 +104,11 @@
                     </div>
                 </div>
                 <div class="custom-stepper" id="primary-value-stepper">
-                    <button class="stepper-btn" id="primary-value-minus" aria-label="Less shapes">-</button>
-                    <input type="number" class="stepper-value-input" id="primary-value-value" min="1" max="1000000" step="1" value="10" title="How many shapes?" inputmode="numeric" placeholder="How many?" />
-                    <button class="stepper-btn" id="primary-value-plus" aria-label="More shapes">+</button>
+                    <button class="stepper-btn" id="primary-value-minus" aria-label="Decrease primary value">-</button>
+                    <input type="number" class="stepper-value-input" id="primary-value-value" min="1" max="1000000" step="1" value="10" title="Primary value (how many shapes?)" inputmode="numeric" placeholder="Primary value" />
+                    <button class="stepper-btn" id="primary-value-plus" aria-label="Increase primary value">+</button>
                 </div>
-                <input type="range" id="primary-slider" value="10" min="1" max="10000" title="How many shapes?">
+                <input type="range" id="primary-slider" value="10" min="1" max="10000" title="Primary value">
             </div>
             <div class="control-panel">
                 <div class="card-title-row">
