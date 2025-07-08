@@ -16,26 +16,25 @@
     </div>
 
     <!-- Controls -->
-    <div class="w-full lg:w-1/4 h-2/5 lg:h-full p-4 overflow-y-auto flex flex-col space-y-4">
-        
+    <div class="sidebar-main">
         <div class="controls-panel">
             <div class="control-panel">
-                <h3 class="font-semibold mb-2 text-lg">Display Mode</h3>
+                <h3 class="card-title">Display Mode</h3>
                 <div id="display-mode-selector" class="tabs">
                     <button data-mode="single" class="tab-btn active">Single Object</button>
                     <button data-mode="arrangement" class="tab-btn">Arrangement</button>
                 </div>
             </div>
-            <div id="arrangement-panel" class="control-panel p-4 rounded-lg hidden">
-                <h3 class="font-semibold mb-2 text-lg">Arrangement Type</h3>
+            <div id="arrangement-panel" class="control-panel hidden">
+                <h3 class="card-title">Arrangement Type</h3>
                 <div id="arrangement-type-selector" class="tabs">
                     <button data-arrangement="grid" class="tab-btn active">Grid</button>
                     <button data-arrangement="pyramid" class="tab-btn">Pyramid</button>
                     <button data-arrangement="line" class="tab-btn">Line</button>
                 </div>
             </div>
-            <div class="control-panel p-4 rounded-lg">
-                <h3 class="font-semibold mb-2 text-lg">Shape</h3>
+            <div class="control-panel">
+                <h3 class="card-title">Shape</h3>
                 <div id="shape-selector" class="grid grid-cols-2 gap-2">
                     <button data-shape="cube" class="control-btn p-2 rounded-md active">Cube</button>
                     <button data-shape="sphere" class="control-btn p-2 rounded-md">Sphere</button>
@@ -43,21 +42,22 @@
                     <button data-shape="cone" class="control-btn p-2 rounded-md">Cone</button>
                 </div>
             </div>
-            <div id="layout-panel" class="control-panel p-4 rounded-lg">
-                <h3 class="font-semibold mb-2 text-lg">Layout</h3>
+            <div id="layout-panel" class="control-panel">
+                <h3 class="card-title">Layout</h3>
                 <div id="layout-selector" class="tabs">
                     <button data-layout="horizontal" class="tab-btn active">Horizontal</button>
                     <button data-layout="vertical" class="tab-btn">Vertical</button>
                 </div>
             </div>
-            <div class="control-panel p-4 rounded-lg space-y-3">
-                <label for="base-unit-size" class="font-semibold text-lg">Base Unit Size</label>
-                <input type="number" id="base-unit-size" value="1" min="0.01" max="5" step="0.01" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Base unit size" title="Base unit size">
+            <div class="control-panel">
+                <h3 class="card-title">Base Unit Size</h3>
+                <input type="number" id="base-unit-size" value="1" min="0.01" max="5" step="0.01" placeholder="Base unit size" title="Base unit size">
                 <input type="range" id="base-unit-slider" value="1" min="0.01" max="5" step="0.01" title="Base unit size">
             </div>
-            <div class="control-panel p-4 rounded-lg space-y-3">
+            <div class="control-panel">
+                <h3 class="card-title">Primary Value</h3>
                 <div class="flex justify-between items-center">
-                    <label for="primary-value" class="font-semibold text-lg">Primary Value</label>
+                    <label for="primary-value">Primary Value</label>
                     <div class="color-picker-wrapper">
                         <input type="color" id="primary-color" value="#818CF8" title="Primary color">
                     </div>
@@ -69,17 +69,18 @@
                         <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
                     </div>
                 </div>
-                <input type="number" id="primary-value" value="10" min="1" max="1000000" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Primary value" title="Primary value">
+                <input type="number" id="primary-value" value="10" min="1" max="1000000" placeholder="Primary value" title="Primary value">
                 <input type="range" id="primary-slider" value="10" min="1" max="10000" title="Primary value">
             </div>
-            <div class="control-panel p-4 rounded-lg space-y-3">
+            <div class="control-panel">
+                <h3 class="card-title">Comparison</h3>
                 <div class="flex items-center justify-between">
-                    <label for="compare-checkbox" class="font-semibold text-lg">Compare</label>
-                    <input type="checkbox" id="compare-checkbox" class="w-5 h-5 rounded text-indigo-500 focus:ring-indigo-500">
+                    <label for="compare-checkbox">Compare</label>
+                    <input type="checkbox" id="compare-checkbox">
                 </div>
                 <div id="comparison-controls" class="space-y-3 hidden">
                     <div class="flex justify-between items-center">
-                        <label for="comparison-value" class="font-semibold">Comparison Value</label>
+                        <label for="comparison-value">Comparison Value</label>
                         <div class="color-picker-wrapper">
                             <input type="color" id="comparison-color" value="#F472B6" title="Comparison color">
                         </div>
@@ -91,18 +92,19 @@
                             <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
                         </div>
                     </div>
-                    <input type="number" id="comparison-value" value="50" min="1" max="1000000" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Comparison value" title="Comparison value">
+                    <input type="number" id="comparison-value" value="50" min="1" max="1000000" placeholder="Comparison value" title="Comparison value">
                     <input type="range" id="comparison-slider" value="50" min="1" max="10000" title="Comparison value">
                 </div>
             </div>
-            <div class="control-panel p-4 rounded-lg flex items-center space-x-3">
-                <label for="zoom-slider" class="font-semibold text-lg">Zoom</label>
-                <input type="range" id="zoom-slider" min="20" max="100" value="50" step="1" title="Zoom level" class="flex-1">
+            <div class="control-panel flex items-center space-x-3">
+                <label for="zoom-slider">Zoom</label>
+                <input type="range" id="zoom-slider" min="10" max="10000" value="30" step="1" title="Zoom level" class="flex-1">
                 <button id="reset-zoom-btn" title="Reset zoom" class="ml-2 p-2 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center">
                     <img src="assets/icons/dark/reset_dark.svg" alt="Reset zoom" width="20" height="20" />
                 </button>
             </div>
         </div>
+    </div>
 
     <script type="importmap">
     {
