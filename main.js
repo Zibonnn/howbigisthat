@@ -351,19 +351,24 @@ function setupCustomSteppers() {
     const baseValue = document.getElementById('base-unit-value');
     const baseSlider = document.getElementById('base-unit-slider');
     function updateBaseUnit(val) {
-        state.baseUnitSize = Math.max(0.01, Math.min(5, parseFloat(val)));
-        baseValue.textContent = state.baseUnitSize.toFixed(2);
+        state.baseUnitSize = Math.max(0.05, Math.min(5, parseFloat(val)));
+        state.baseUnitSize = Math.round(state.baseUnitSize * 100) / 100;
+        baseValue.value = state.baseUnitSize.toFixed(2);
         baseSlider.value = state.baseUnitSize;
         updateScene();
     }
     baseMinus.addEventListener('click', () => {
-        updateBaseUnit((state.baseUnitSize - 0.01).toFixed(2));
+        updateBaseUnit((state.baseUnitSize - 0.05).toFixed(2));
     });
     basePlus.addEventListener('click', () => {
-        updateBaseUnit((state.baseUnitSize + 0.01).toFixed(2));
+        updateBaseUnit((state.baseUnitSize + 0.05).toFixed(2));
     });
     baseSlider.addEventListener('input', (e) => {
         updateBaseUnit(e.target.value);
+    });
+    baseValue.addEventListener('input', (e) => {
+        let val = parseFloat(e.target.value);
+        if (!isNaN(val)) updateBaseUnit(val);
     });
     updateBaseUnit(state.baseUnitSize);
 
@@ -374,7 +379,7 @@ function setupCustomSteppers() {
     const primarySlider = document.getElementById('primary-slider');
     function updatePrimary(val) {
         state.primaryValue = Math.max(1, Math.min(1000000, parseInt(val, 10)));
-        primaryValue.textContent = state.primaryValue;
+        primaryValue.value = state.primaryValue;
         primarySlider.value = state.primaryValue;
         updateScene();
     }
@@ -387,6 +392,10 @@ function setupCustomSteppers() {
     primarySlider.addEventListener('input', (e) => {
         updatePrimary(e.target.value);
     });
+    primaryValue.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value, 10);
+        if (!isNaN(val)) updatePrimary(val);
+    });
     updatePrimary(state.primaryValue);
 
     // Comparison Value
@@ -396,7 +405,7 @@ function setupCustomSteppers() {
     const comparisonSlider = document.getElementById('comparison-slider');
     function updateComparison(val) {
         state.comparisonValue = Math.max(1, Math.min(1000000, parseInt(val, 10)));
-        comparisonValue.textContent = state.comparisonValue;
+        comparisonValue.value = state.comparisonValue;
         comparisonSlider.value = state.comparisonValue;
         updateScene();
     }
@@ -409,6 +418,10 @@ function setupCustomSteppers() {
         });
         comparisonSlider.addEventListener('input', (e) => {
             updateComparison(e.target.value);
+        });
+        comparisonValue.addEventListener('input', (e) => {
+            let val = parseInt(e.target.value, 10);
+            if (!isNaN(val)) updateComparison(val);
         });
         updateComparison(state.comparisonValue);
     }
