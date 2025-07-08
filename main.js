@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+document.addEventListener('DOMContentLoaded', () => {
 // --- Global State ---
 const state = {
     displayMode: 'single', // 'single' or 'arrangement'
@@ -267,4 +268,5 @@ function setupEventListeners() {
 
 // --- Initialize ---
 init();
-setupEventListeners(); 
+setupEventListeners();
+}); 
