@@ -17,6 +17,9 @@ const state = {
 };
 
 const DEFAULT_FOV = 50;
+const DEFAULT_CAMERA_DISTANCE = 30;
+const MIN_CAMERA_DISTANCE = 10;
+const MAX_CAMERA_DISTANCE = 100;
 let scene, camera, renderer, controls;
 let primaryObject, comparisonObject;
 const canvasContainer = document.getElementById('canvas-container');
@@ -28,8 +31,8 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000, 0);
 
-    camera = new THREE.PerspectiveCamera(DEFAULT_FOV, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 5000);
-    camera.position.set(15, 10, 30);
+    camera = new THREE.PerspectiveCamera(50, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 5000);
+    camera.position.set(15, 10, DEFAULT_CAMERA_DISTANCE);
     camera.lookAt(scene.position);
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -41,6 +44,9 @@ function init() {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
+    controls.minDistance = MIN_CAMERA_DISTANCE;
+    controls.maxDistance = MAX_CAMERA_DISTANCE;
+    controls.addEventListener('change', syncZoomSliderWithCamera);
 
     window.addEventListener('resize', onWindowResize);
     onWindowResize();
@@ -49,21 +55,46 @@ function init() {
     setupZoomControls();
 }
 
+function getCameraDistance() {
+    // Distance from camera to scene origin
+    return camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+}
+
+function setCameraDistance(distance) {
+    // Move camera along its current direction vector
+    const dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    dir.normalize();
+    camera.position.copy(dir.multiplyScalar(-distance));
+    camera.lookAt(0, 0, 0);
+    controls.update();
+}
+
 function setupZoomControls() {
     const zoomSlider = document.getElementById('zoom-slider');
     const resetZoomBtn = document.getElementById('reset-zoom-btn');
     if (!zoomSlider || !resetZoomBtn) return;
-    // Set initial slider value to match camera fov
-    zoomSlider.value = camera.fov;
+    zoomSlider.min = MIN_CAMERA_DISTANCE;
+    zoomSlider.max = MAX_CAMERA_DISTANCE;
+    zoomSlider.step = 1;
+    // Set initial slider value to match camera distance
+    zoomSlider.value = Math.round(getCameraDistance());
     zoomSlider.addEventListener('input', (e) => {
-        camera.fov = parseFloat(e.target.value);
-        camera.updateProjectionMatrix();
+        setCameraDistance(parseFloat(e.target.value));
     });
     resetZoomBtn.addEventListener('click', () => {
-        camera.fov = DEFAULT_FOV;
-        camera.updateProjectionMatrix();
-        zoomSlider.value = DEFAULT_FOV;
+        setCameraDistance(DEFAULT_CAMERA_DISTANCE);
+        zoomSlider.value = DEFAULT_CAMERA_DISTANCE;
     });
+}
+
+function syncZoomSliderWithCamera() {
+    const zoomSlider = document.getElementById('zoom-slider');
+    if (!zoomSlider) return;
+    const dist = Math.round(getCameraDistance());
+    if (parseInt(zoomSlider.value, 10) !== dist) {
+        zoomSlider.value = dist;
+    }
 }
 
 function onWindowResize() {
