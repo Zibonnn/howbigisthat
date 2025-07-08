@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Big Is That</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* A very dark blue-gray */
+            color: #E5E7EB; /* Light gray for text */
+        }
+        #visualization-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        #visualization-canvas:active {
+            cursor: grabbing;
+        }
+        .control-panel {
+            background-color: rgba(31, 41, 55, 0.8); /* Semi-transparent dark gray */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+        }
+        .control-btn {
+            background-color: #374151;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .control-btn:hover {
+            background-color: #4B5563;
+        }
+        .control-btn.active {
+            background-color: #4F46E5; /* Indigo */
+            color: white;
+            transform: scale(1.05);
+        }
+        input[type="range"] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 8px; background: #4B5563;
+            border-radius: 5px; outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #818CF8;
+            cursor: pointer; border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; height: 20px; background: #818CF8;
+            cursor: pointer; border-radius: 50%;
+        }
+        .color-picker-wrapper {
+            border: 2px solid #4B5563;
+            border-radius: 50%;
+            padding: 2px;
+            display: inline-block;
+        }
+        input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border-radius: 50%;
+            border: none;
+        }
+        input[type="color"]::-moz-color-swatch {
+            border-radius: 50%;
+            border: none;
+        }
+    </style>
+</head>
+<body class="w-full h-screen m-0 p-0 flex flex-col lg:flex-row overflow-hidden">
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container" class="w-full h-3/5 lg:h-full lg:w-3/4 relative">
+        <h1 style="font-family: 'Fredoka One', cursive;" class="absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
+        <canvas id="visualization-canvas"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="w-full lg:w-1/4 h-2/5 lg:h-full p-4 overflow-y-auto flex flex-col space-y-4">
+        
+        <div class="control-panel p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Display Mode</h3>
+            <div id="display-mode-selector" class="grid grid-cols-2 gap-2">
+                <button data-mode="single" class="control-btn p-2 rounded-md active">Single Object</button>
+                <button data-mode="arrangement" class="control-btn p-2 rounded-md">Arrangement</button>
+            </div>
+        </div>
+        
+        <div id="arrangement-panel" class="control-panel p-4 rounded-lg hidden">
+            <h3 class="font-semibold mb-2 text-lg">Arrangement Type</h3>
+            <div id="arrangement-type-selector" class="grid grid-cols-3 gap-2">
+                <button data-arrangement="grid" class="control-btn p-2 rounded-md active">Grid</button>
+                <button data-arrangement="pyramid" class="control-btn p-2 rounded-md">Pyramid</button>
+                <button data-arrangement="line" class="control-btn p-2 rounded-md">Line</button>
+            </div>
+        </div>
+
+        <div class="control-panel p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Shape</h3>
+            <div id="shape-selector" class="grid grid-cols-2 gap-2">
+                <button data-shape="cube" class="control-btn p-2 rounded-md active">Cube</button>
+                <button data-shape="sphere" class="control-btn p-2 rounded-md">Sphere</button>
+                <button data-shape="cylinder" class="control-btn p-2 rounded-md">Cylinder</button>
+                <button data-shape="cone" class="control-btn p-2 rounded-md">Cone</button>
+            </div>
+        </div>
+        
+        <div id="layout-panel" class="control-panel p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Layout</h3>
+            <div id="layout-selector" class="grid grid-cols-2 gap-2">
+                <button data-layout="horizontal" class="control-btn p-2 rounded-md active">Horizontal</button>
+                <button data-layout="vertical" class="control-btn p-2 rounded-md">Vertical</button>
+            </div>
+        </div>
+        
+        <div class="control-panel p-4 rounded-lg space-y-3">
+            <label for="base-unit-size" class="font-semibold text-lg">Base Unit Size</label>
+            <input type="number" id="base-unit-size" value="1" min="0.01" max="5" step="0.01" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="range" id="base-unit-slider" value="1" min="0.01" max="5" step="0.01">
+        </div>
+
+        <!-- Primary Value Controls -->
+        <div class="control-panel p-4 rounded-lg space-y-3">
+            <div class="flex justify-between items-center">
+                <label for="primary-value" class="font-semibold text-lg">Primary Value</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="primary-color" value="#818CF8">
+                </div>
+            </div>
+            <input type="number" id="primary-value" value="10" min="1" max="1000000" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="range" id="primary-slider" value="10" min="1" max="10000">
+        </div>
+
+        <!-- Comparison Controls -->
+        <div class="control-panel p-4 rounded-lg space-y-3">
+            <div class="flex items-center justify-between">
+                <label for="compare-checkbox" class="font-semibold text-lg">Compare</label>
+                <input type="checkbox" id="compare-checkbox" class="w-5 h-5 rounded text-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div id="comparison-controls" class="space-y-3 hidden">
+                <div class="flex justify-between items-center">
+                    <label for="comparison-value" class="font-semibold">Comparison Value</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="comparison-color" value="#F472B6">
+                    </div>
+                </div>
+                <input type="number" id="comparison-value" value="50" min="1" max="1000000" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="range" id="comparison-slider" value="50" min="1" max="10000">
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- Global State ---
+        const state = {
+            displayMode: 'single', // 'single' or 'arrangement'
+            arrangementType: 'grid', // 'grid', 'pyramid', 'line'
+            shape: 'cube',
+            layout: 'horizontal',
+            baseUnitSize: 1,
+            primaryValue: 10,
+            primaryColor: '#818CF8',
+            isComparing: false,
+            comparisonValue: 50,
+            comparisonColor: '#F472B6',
+        };
+
+        // --- 3D Scene Setup ---
+        let scene, camera, renderer, controls;
+        let primaryObject, comparisonObject;
+        const canvasContainer = document.getElementById('canvas-container');
+        const canvas = document.getElementById('visualization-canvas');
+
+        function init() {
+            scene = new THREE.Scene();
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(0x000000, 0);
+
+            camera = new THREE.PerspectiveCamera(50, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 5000);
+            camera.position.set(15, 10, 30);
+            camera.lookAt(scene.position);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            directionalLight.position.set(15, 25, 10);
+            scene.add(directionalLight);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            window.addEventListener('resize', onWindowResize);
+            onWindowResize();
+            animate();
+            updateScene();
+        }
+
+        function onWindowResize() {
+            const width = canvasContainer.clientWidth;
+            const height = canvasContainer.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // --- Core Logic ---
+        function getUnitGeometry(shapeType, size = 1) {
+            switch (shapeType) {
+                case 'sphere': return new THREE.SphereGeometry(size / 2, 16, 16);
+                case 'cylinder': return new THREE.CylinderGeometry(size / 2, size / 2, size, 16);
+                case 'cone': return new THREE.ConeGeometry(size / 2, size, 16);
+                case 'cube': default: return new THREE.BoxGeometry(size, size, size);
+            }
+        }
+
+        function createSingleObject(value, shapeType, color) {
+            const scaleFactor = Math.cbrt(value);
+            const geometry = getUnitGeometry(shapeType, scaleFactor * state.baseUnitSize);
+            const material = new THREE.MeshStandardMaterial({ color, metalness: 0.2, roughness: 0.6 });
+            return new THREE.Mesh(geometry, material);
+        }
+
+        function createArrangement(value, shapeType, color, arrangementType) {
+            const group = new THREE.Group();
+            const unitGeometry = getUnitGeometry(shapeType, state.baseUnitSize);
+            const material = new THREE.MeshStandardMaterial({ color, metalness: 0.2, roughness: 0.6 });
+            const unitSize = state.baseUnitSize;
+            const gap = 0.2 * unitSize;
+            const step = unitSize + gap;
+
+            if (arrangementType === 'line') {
+                for (let i = 0; i < value; i++) {
+                    const mesh = new THREE.Mesh(unitGeometry, material);
+                    mesh.position.x = i * step;
+                    group.add(mesh);
+                }
+            } else if (arrangementType === 'grid') {
+                const cols = Math.ceil(Math.sqrt(value));
+                for (let i = 0; i < value; i++) {
+                    const mesh = new THREE.Mesh(unitGeometry, material);
+                    const row = Math.floor(i / cols);
+                    const col = i % cols;
+                    mesh.position.set(col * step, row * step, 0);
+                    group.add(mesh);
+                }
+            } else if (arrangementType === 'pyramid') {
+                let count = 0;
+                let level = 0;
+                while (count < value) {
+                    const layerSize = level + 1;
+                    for (let x = 0; x < layerSize && count < value; x++) {
+                        for (let z = 0; z < layerSize && count < value; z++) {
+                            const mesh = new THREE.Mesh(unitGeometry, material);
+                            mesh.position.set(
+                                (x - (layerSize - 1) / 2) * step,
+                                level * step,
+                                (z - (layerSize - 1) / 2) * step
+                            );
+                            group.add(mesh);
+                            count++;
+                        }
+                    }
+                    level++;
+                }
+            }
+            
+            const box = new THREE.Box3().setFromObject(group);
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+            group.children.forEach(child => child.position.sub(center));
+
+            return group;
+        }
+
+        function updateScene() {
+            if (primaryObject) scene.remove(primaryObject);
+            if (comparisonObject) scene.remove(comparisonObject);
+
+            const createObject = state.displayMode === 'single' ? createSingleObject : (v, s, c) => createArrangement(v, s, c, state.arrangementType);
+
+            primaryObject = createObject(state.primaryValue, state.shape, state.primaryColor);
+            scene.add(primaryObject);
+
+            if (state.isComparing) {
+                comparisonObject = createObject(state.comparisonValue, state.shape, state.comparisonColor);
+                scene.add(comparisonObject);
+                positionObjects();
+            } else {
+                primaryObject.position.set(0, 0, 0);
+            }
+        }
+
+        function positionObjects() {
+            if (!primaryObject || !comparisonObject) return;
+            
+            const primaryBox = new THREE.Box3().setFromObject(primaryObject);
+            const comparisonBox = new THREE.Box3().setFromObject(comparisonObject);
+            const primarySize = new THREE.Vector3();
+            primaryBox.getSize(primarySize);
+            const comparisonSize = new THREE.Vector3();
+            comparisonBox.getSize(comparisonSize);
+
+            const gap = 4 * state.baseUnitSize;
+
+            if (state.layout === 'horizontal') {
+                const totalWidth = primarySize.x + comparisonSize.x + gap;
+                primaryObject.position.x = -totalWidth / 2 + primarySize.x / 2;
+                comparisonObject.position.x = totalWidth / 2 - comparisonSize.x / 2;
+                primaryObject.position.y = 0;
+                comparisonObject.position.y = 0;
+            } else { // Vertical
+                const totalHeight = primarySize.y + comparisonSize.y + gap;
+                primaryObject.position.y = -totalHeight / 2 + primarySize.y / 2;
+                comparisonObject.position.y = totalHeight / 2 - comparisonSize.y / 2;
+                primaryObject.position.x = 0;
+                comparisonObject.position.x = 0;
+            }
+        }
+
+        // --- Event Listeners ---
+        function setupEventListeners() {
+            // Display Mode, Arrangement, Shape, Layout...
+            document.getElementById('display-mode-selector').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    state.displayMode = e.target.dataset.mode;
+                    document.querySelectorAll('#display-mode-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById('arrangement-panel').classList.toggle('hidden', state.displayMode !== 'arrangement');
+                    updateScene();
+                }
+            });
+            document.getElementById('arrangement-type-selector').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    state.arrangementType = e.target.dataset.arrangement;
+                    document.querySelectorAll('#arrangement-type-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateScene();
+                }
+            });
+            document.getElementById('shape-selector').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    state.shape = e.target.dataset.shape;
+                    document.querySelectorAll('#shape-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateScene();
+                }
+            });
+            document.getElementById('layout-selector').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    state.layout = e.target.dataset.layout;
+                    document.querySelectorAll('#layout-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    positionObjects();
+                }
+            });
+
+            // Base Unit Size Controls
+            const unitSizeInput = document.getElementById('base-unit-size');
+            const unitSizeSlider = document.getElementById('base-unit-slider');
+            unitSizeInput.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                if (!isNaN(val)) { state.baseUnitSize = Math.max(0.01, val); unitSizeSlider.value = state.baseUnitSize; updateScene(); }
+            });
+            unitSizeSlider.addEventListener('input', (e) => {
+                state.baseUnitSize = parseFloat(e.target.value); unitSizeInput.value = state.baseUnitSize; updateScene();
+            });
+
+            // Primary Controls
+            const primaryValueInput = document.getElementById('primary-value');
+            const primarySlider = document.getElementById('primary-slider');
+            const primaryColorInput = document.getElementById('primary-color');
+            primaryValueInput.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val)) { state.primaryValue = Math.max(1, val); primarySlider.value = Math.min(val, 10000); updateScene(); }
+            });
+            primarySlider.addEventListener('input', (e) => {
+                state.primaryValue = parseInt(e.target.value, 10); primaryValueInput.value = state.primaryValue; updateScene();
+            });
+            primaryColorInput.addEventListener('input', (e) => {
+                state.primaryColor = e.target.value; updateScene();
+            });
+
+            // Comparison Controls
+            const compareCheckbox = document.getElementById('compare-checkbox');
+            const comparisonControls = document.getElementById('comparison-controls');
+            const comparisonValueInput = document.getElementById('comparison-value');
+            const comparisonSlider = document.getElementById('comparison-slider');
+            const comparisonColorInput = document.getElementById('comparison-color');
+            compareCheckbox.addEventListener('change', (e) => {
+                state.isComparing = e.target.checked;
+                comparisonControls.classList.toggle('hidden', !state.isComparing);
+                document.getElementById('layout-panel').classList.toggle('hidden', !state.isComparing);
+                updateScene();
+            });
+            comparisonValueInput.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val)) { state.comparisonValue = Math.max(1, val); comparisonSlider.value = Math.min(val, 10000); updateScene(); }
+            });
+            comparisonSlider.addEventListener('input', (e) => {
+                state.comparisonValue = parseInt(e.target.value, 10); comparisonValueInput.value = state.comparisonValue; updateScene();
+            });
+            comparisonColorInput.addEventListener('input', (e) => {
+                state.comparisonColor = e.target.value; updateScene();
+            });
+            
+            // Initial state for hidden panels
+            document.getElementById('layout-panel').classList.toggle('hidden', !state.isComparing);
+        }
+
+        // --- Initialize ---
+        init();
+        setupEventListeners();
+
+    </script>
+</body>
+</html>

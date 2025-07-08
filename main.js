@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const state = {
     displayMode: 'single', // 'single' or 'arrangement'
     arrangementType: 'grid', // 'grid', 'pyramid', 'line'
-    shape: 'cube',
+    shape: 'sphere',
     layout: 'horizontal',
     baseUnitSize: 1,
     primaryValue: 10,
@@ -173,7 +173,6 @@ function createSingleObject(value, shapeType, color) {
 
 function createArrangement(value, shapeType, color, arrangementType) {
     const group = new THREE.Group();
-    const unitGeometry = getUnitGeometry(shapeType, state.baseUnitSize);
     const material = new THREE.MeshStandardMaterial({ color, metalness: 0.2, roughness: 0.6 });
     const unitSize = state.baseUnitSize;
     const gap = 0.2 * unitSize;
@@ -181,14 +180,14 @@ function createArrangement(value, shapeType, color, arrangementType) {
 
     if (arrangementType === 'line') {
         for (let i = 0; i < value; i++) {
-            const mesh = new THREE.Mesh(unitGeometry, material);
+            const mesh = new THREE.Mesh(getUnitGeometry(shapeType, unitSize), material);
             mesh.position.x = i * step;
             group.add(mesh);
         }
     } else if (arrangementType === 'grid') {
         const cols = Math.ceil(Math.sqrt(value));
         for (let i = 0; i < value; i++) {
-            const mesh = new THREE.Mesh(unitGeometry, material);
+            const mesh = new THREE.Mesh(getUnitGeometry(shapeType, unitSize), material);
             const row = Math.floor(i / cols);
             const col = i % cols;
             mesh.position.set(col * step, row * step, 0);
@@ -201,7 +200,7 @@ function createArrangement(value, shapeType, color, arrangementType) {
             const layerSize = level + 1;
             for (let x = 0; x < layerSize && count < value; x++) {
                 for (let z = 0; z < layerSize && count < value; z++) {
-                    const mesh = new THREE.Mesh(unitGeometry, material);
+                    const mesh = new THREE.Mesh(getUnitGeometry(shapeType, unitSize), material);
                     mesh.position.set(
                         (x - (layerSize - 1) / 2) * step,
                         level * step,
