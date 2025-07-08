@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-document.addEventListener('DOMContentLoaded', () => {
 // --- Global State ---
 const state = {
     displayMode: 'single', // 'single' or 'arrangement'
@@ -231,7 +230,7 @@ function positionObjects() {
 }
 
 // --- Event Listeners ---
-function setupEventListeners() {
+function setupEventListeners(compareCheckbox, comparisonControls) {
     // Display Mode, Arrangement, Shape, Layout...
     document.getElementById('display-mode-selector').addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
@@ -294,17 +293,10 @@ function setupEventListeners() {
     });
 
     // Comparison Controls
-    const compareCheckbox = document.getElementById('compare-checkbox');
-    const comparisonControls = document.getElementById('comparison-controls');
     const comparisonValueInput = document.getElementById('comparison-value');
     const comparisonSlider = document.getElementById('comparison-slider');
     const comparisonColorInput = document.getElementById('comparison-color');
-    compareCheckbox.addEventListener('change', (e) => {
-        state.isComparing = e.target.checked;
-        comparisonControls.classList.toggle('hidden', !state.isComparing);
-        document.getElementById('layout-panel').classList.toggle('hidden', !state.isComparing);
-        updateScene();
-    });
+    // Removed the compareCheckbox.addEventListener('change', ...) block
     comparisonValueInput.addEventListener('input', (e) => {
         const val = parseInt(e.target.value, 10);
         if (!isNaN(val)) { state.comparisonValue = Math.max(1, val); comparisonSlider.value = Math.min(val, 10000); updateScene(); }
@@ -428,7 +420,23 @@ function setupCustomSteppers() {
 }
 
 // --- Initialize ---
-init();
-setupEventListeners();
-setupCustomSteppers();
+document.addEventListener('DOMContentLoaded', () => {
+    const compareCheckbox = document.getElementById('compare-checkbox');
+    const comparisonControls = document.getElementById('comparison-controls');
+    const layoutPanel = document.getElementById('layout-panel');
+    // Set initial state
+    if (compareCheckbox && comparisonControls && layoutPanel) {
+        comparisonControls.classList.toggle('hidden', !compareCheckbox.checked);
+        layoutPanel.classList.toggle('hidden', !compareCheckbox.checked);
+        // Attach a single, correct event listener
+        compareCheckbox.addEventListener('change', function(e) {
+            comparisonControls.classList.toggle('hidden', !e.target.checked);
+            layoutPanel.classList.toggle('hidden', !e.target.checked);
+            state.isComparing = e.target.checked;
+            updateScene();
+        });
+    }
+    init();
+    setupEventListeners();
+    setupCustomSteppers();
 }); 
