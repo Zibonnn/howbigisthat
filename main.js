@@ -67,12 +67,11 @@ function getCameraDistance() {
 }
 
 function setCameraDistance(distance) {
-    // Move camera along its current direction vector
-    const dir = new THREE.Vector3();
-    camera.getWorldDirection(dir);
-    dir.normalize();
-    camera.position.copy(dir.multiplyScalar(-distance));
-    camera.lookAt(0, 0, 0);
+    // Move camera along the vector from origin to camera, preserving direction
+    const origin = new THREE.Vector3(0, 0, 0);
+    const camDir = camera.position.clone().sub(origin).normalize();
+    camera.position.copy(camDir.multiplyScalar(distance));
+    camera.lookAt(origin);
     controls.update();
 }
 
