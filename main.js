@@ -99,8 +99,8 @@ window.addEventListener('DOMContentLoaded', function () {
         mat.metallic = 0.0;
         mat.roughness = 0.9;
         try {
-            mat.albedoTexture = new BABYLON.Texture('assets/textures/rock.jpg', scene);
-            mat.bumpTexture = new BABYLON.Texture('assets/textures/rockn.jpg', scene);
+            mat.albedoTexture = new BABYLON.Texture('assets/textures/Rock.jpg', scene);
+            // mat.bumpTexture = new BABYLON.Texture('assets/textures/Rockn.jpg', scene); // Only if you add this file
         } catch (e) {
             console.warn('Rock texture not found, using color only.');
         }
