@@ -19,7 +19,7 @@ const state = {
 const DEFAULT_FOV = 50;
 const DEFAULT_CAMERA_DISTANCE = 30;
 const MIN_CAMERA_DISTANCE = 10;
-const MAX_CAMERA_DISTANCE = 100;
+const MAX_CAMERA_DISTANCE = 10000;
 let scene, camera, renderer, controls;
 let primaryObject, comparisonObject;
 const canvasContainer = document.getElementById('canvas-container');
