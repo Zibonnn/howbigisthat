@@ -265,51 +265,8 @@ function setupEventListeners(compareCheckbox, comparisonControls) {
             positionObjects();
         }
     });
-
-    // Base Unit Size Controls
-    const unitSizeInput = document.getElementById('base-unit-size');
-    const unitSizeSlider = document.getElementById('base-unit-slider');
-    unitSizeInput.addEventListener('input', (e) => {
-        const val = parseFloat(e.target.value);
-        if (!isNaN(val)) { state.baseUnitSize = Math.max(0.01, val); unitSizeSlider.value = state.baseUnitSize; updateScene(); }
-    });
-    unitSizeSlider.addEventListener('input', (e) => {
-        state.baseUnitSize = parseFloat(e.target.value); unitSizeInput.value = state.baseUnitSize; updateScene();
-    });
-
-    // Primary Controls
-    const primaryValueInput = document.getElementById('primary-value');
-    const primarySlider = document.getElementById('primary-slider');
-    const primaryColorInput = document.getElementById('primary-color');
-    primaryValueInput.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        if (!isNaN(val)) { state.primaryValue = Math.max(1, val); primarySlider.value = Math.min(val, 10000); updateScene(); }
-    });
-    primarySlider.addEventListener('input', (e) => {
-        state.primaryValue = parseInt(e.target.value, 10); primaryValueInput.value = state.primaryValue; updateScene();
-    });
-    primaryColorInput.addEventListener('input', (e) => {
-        state.primaryColor = e.target.value; updateScene();
-    });
-
-    // Comparison Controls
-    const comparisonValueInput = document.getElementById('comparison-value');
-    const comparisonSlider = document.getElementById('comparison-slider');
-    const comparisonColorInput = document.getElementById('comparison-color');
-    // Removed the compareCheckbox.addEventListener('change', ...) block
-    comparisonValueInput.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        if (!isNaN(val)) { state.comparisonValue = Math.max(1, val); comparisonSlider.value = Math.min(val, 10000); updateScene(); }
-    });
-    comparisonSlider.addEventListener('input', (e) => {
-        state.comparisonValue = parseInt(e.target.value, 10); comparisonValueInput.value = state.comparisonValue; updateScene();
-    });
-    comparisonColorInput.addEventListener('input', (e) => {
-        state.comparisonColor = e.target.value; updateScene();
-    });
-    
-    // Initial state for hidden panels
-    document.getElementById('layout-panel').classList.toggle('hidden', !state.isComparing);
+    // Remove all event listeners for base unit, primary value, and comparison value inputs and sliders from here.
+    // Let setupCustomSteppers handle all stepper and slider logic.
 }
 
 function setupColorSwatches() {
@@ -337,106 +294,82 @@ function setupColorSwatches() {
 
 // --- Custom Stepper Logic ---
 function setupCustomSteppers() {
+    // Helper for all steppers
+    function setupStepper({ minusBtnId, plusBtnId, inputId, sliderId, stateKey, min, max, step, toFixed }) {
+        const minusBtn = document.getElementById(minusBtnId);
+        const plusBtn = document.getElementById(plusBtnId);
+        const input = document.getElementById(inputId);
+        const slider = document.getElementById(sliderId);
+        if (!minusBtn || !plusBtn || !input || !slider) return;
+        function clamp(val) {
+            let v = parseFloat(val);
+            if (isNaN(v)) v = min;
+            v = Math.max(min, Math.min(max, v));
+            if (toFixed) v = parseFloat(v.toFixed(toFixed));
+            return v;
+        }
+        function getStep() {
+            return parseFloat(input.step) || step;
+        }
+        function update(val) {
+            const v = clamp(val);
+            state[stateKey] = v;
+            input.value = toFixed ? v.toFixed(toFixed) : v;
+            slider.value = v;
+            updateScene();
+        }
+        minusBtn.addEventListener('click', () => {
+            update(parseFloat(input.value) - getStep());
+        });
+        plusBtn.addEventListener('click', () => {
+            update(parseFloat(input.value) + getStep());
+        });
+        slider.addEventListener('input', (e) => {
+            update(e.target.value);
+        });
+        input.addEventListener('input', (e) => {
+            update(e.target.value);
+        });
+        // Initialize
+        update(state[stateKey]);
+    }
     // Base Unit Size
-    const baseMinus = document.getElementById('base-unit-minus');
-    const basePlus = document.getElementById('base-unit-plus');
-    const baseValue = document.getElementById('base-unit-value');
-    const baseSlider = document.getElementById('base-unit-slider');
-    function updateBaseUnit(val) {
-        state.baseUnitSize = Math.max(0.05, Math.min(5, parseFloat(val)));
-        state.baseUnitSize = Math.round(state.baseUnitSize * 100) / 100;
-        baseValue.value = state.baseUnitSize.toFixed(2);
-        baseSlider.value = state.baseUnitSize;
-        updateScene();
-    }
-    baseMinus.addEventListener('click', () => {
-        updateBaseUnit((state.baseUnitSize - 0.05).toFixed(2));
+    setupStepper({
+        minusBtnId: 'base-unit-minus',
+        plusBtnId: 'base-unit-plus',
+        inputId: 'base-unit-value',
+        sliderId: 'base-unit-slider',
+        stateKey: 'baseUnitSize',
+        min: 0.05,
+        max: 5,
+        step: 0.05,
+        toFixed: 2
     });
-    basePlus.addEventListener('click', () => {
-        updateBaseUnit((state.baseUnitSize + 0.05).toFixed(2));
-    });
-    baseSlider.addEventListener('input', (e) => {
-        updateBaseUnit(e.target.value);
-    });
-    baseValue.addEventListener('input', (e) => {
-        let val = parseFloat(e.target.value);
-        if (!isNaN(val)) updateBaseUnit(val);
-    });
-    updateBaseUnit(state.baseUnitSize);
-
     // Primary Value
-    const primaryMinus = document.getElementById('primary-value-minus');
-    const primaryPlus = document.getElementById('primary-value-plus');
-    const primaryValue = document.getElementById('primary-value-value');
-    const primarySlider = document.getElementById('primary-slider');
-    function updatePrimary(val) {
-        state.primaryValue = Math.max(1, Math.min(1000000, parseInt(val, 10)));
-        primaryValue.value = state.primaryValue;
-        primarySlider.value = state.primaryValue;
-        updateScene();
-    }
-    primaryMinus.addEventListener('click', () => {
-        updatePrimary(state.primaryValue - 1);
+    setupStepper({
+        minusBtnId: 'primary-value-minus',
+        plusBtnId: 'primary-value-plus',
+        inputId: 'primary-value-value',
+        sliderId: 'primary-slider',
+        stateKey: 'primaryValue',
+        min: 1,
+        max: 1000000,
+        step: 1
     });
-    primaryPlus.addEventListener('click', () => {
-        updatePrimary(state.primaryValue + 1);
-    });
-    primarySlider.addEventListener('input', (e) => {
-        updatePrimary(e.target.value);
-    });
-    primaryValue.addEventListener('input', (e) => {
-        let val = parseInt(e.target.value, 10);
-        if (!isNaN(val)) updatePrimary(val);
-    });
-    updatePrimary(state.primaryValue);
-
     // Comparison Value
-    const comparisonMinus = document.getElementById('comparison-value-minus');
-    const comparisonPlus = document.getElementById('comparison-value-plus');
-    const comparisonValue = document.getElementById('comparison-value-value');
-    const comparisonSlider = document.getElementById('comparison-slider');
-    function updateComparison(val) {
-        state.comparisonValue = Math.max(1, Math.min(1000000, parseInt(val, 10)));
-        comparisonValue.value = state.comparisonValue;
-        comparisonSlider.value = state.comparisonValue;
-        updateScene();
-    }
-    if (comparisonMinus && comparisonPlus && comparisonValue && comparisonSlider) {
-        comparisonMinus.addEventListener('click', () => {
-            updateComparison(state.comparisonValue - 1);
-        });
-        comparisonPlus.addEventListener('click', () => {
-            updateComparison(state.comparisonValue + 1);
-        });
-        comparisonSlider.addEventListener('input', (e) => {
-            updateComparison(e.target.value);
-        });
-        comparisonValue.addEventListener('input', (e) => {
-            let val = parseInt(e.target.value, 10);
-            if (!isNaN(val)) updateComparison(val);
-        });
-        updateComparison(state.comparisonValue);
-    }
+    setupStepper({
+        minusBtnId: 'comparison-value-minus',
+        plusBtnId: 'comparison-value-plus',
+        inputId: 'comparison-value-value',
+        sliderId: 'comparison-slider',
+        stateKey: 'comparisonValue',
+        min: 1,
+        max: 1000000,
+        step: 1
+    });
 }
 
 // --- Initialize ---
-document.addEventListener('DOMContentLoaded', () => {
-    const compareCheckbox = document.getElementById('compare-checkbox');
-    const comparisonControls = document.getElementById('comparison-controls');
-    const layoutPanel = document.getElementById('layout-panel');
-    // Set initial state
-    if (compareCheckbox && comparisonControls && layoutPanel) {
-        comparisonControls.classList.toggle('hidden', !compareCheckbox.checked);
-        layoutPanel.classList.toggle('hidden', !compareCheckbox.checked);
-        // Attach a single, correct event listener
-        compareCheckbox.addEventListener('change', function(e) {
-            comparisonControls.classList.toggle('hidden', !e.target.checked);
-            layoutPanel.classList.toggle('hidden', !e.target.checked);
-            state.isComparing = e.target.checked;
-            updateScene();
-        });
-    }
-    init();
-    setupEventListeners();
-    setupCustomSteppers();
-}); 
+init();
+setupEventListeners();
+setupCustomSteppers(); 
