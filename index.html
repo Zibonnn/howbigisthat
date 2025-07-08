@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Big Is That</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="w-full h-screen m-0 p-0 flex flex-col lg:flex-row overflow-hidden">
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container" class="w-full h-3/5 lg:h-full lg:w-3/4 relative">
+        <h1 style="font-family: 'Fredoka One', cursive;" class="absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
+        <canvas id="visualization-canvas"></canvas>
+    </div>
+
+    <!-- Controls -->
+    <div class="w-full lg:w-1/4 h-2/5 lg:h-full p-4 overflow-y-auto flex flex-col space-y-4">
+        
+        <div class="control-panel p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Display Mode</h3>
+            <div id="display-mode-selector" class="grid grid-cols-2 gap-2">
+                <button data-mode="single" class="control-btn p-2 rounded-md active">Single Object</button>
+                <button data-mode="arrangement" class="control-btn p-2 rounded-md">Arrangement</button>
+            </div>
+        </div>
+        
+        <div id="arrangement-panel" class="control-panel p-4 rounded-lg hidden">
+            <h3 class="font-semibold mb-2 text-lg">Arrangement Type</h3>
+            <div id="arrangement-type-selector" class="grid grid-cols-3 gap-2">
+                <button data-arrangement="grid" class="control-btn p-2 rounded-md active">Grid</button>
+                <button data-arrangement="pyramid" class="control-btn p-2 rounded-md">Pyramid</button>
+                <button data-arrangement="line" class="control-btn p-2 rounded-md">Line</button>
+            </div>
+        </div>
+
+        <div class="control-panel p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Shape</h3>
+            <div id="shape-selector" class="grid grid-cols-2 gap-2">
+                <button data-shape="cube" class="control-btn p-2 rounded-md active">Cube</button>
+                <button data-shape="sphere" class="control-btn p-2 rounded-md">Sphere</button>
+                <button data-shape="cylinder" class="control-btn p-2 rounded-md">Cylinder</button>
+                <button data-shape="cone" class="control-btn p-2 rounded-md">Cone</button>
+            </div>
+        </div>
+        
+        <div id="layout-panel" class="control-panel p-4 rounded-lg">
+            <h3 class="font-semibold mb-2 text-lg">Layout</h3>
+            <div id="layout-selector" class="grid grid-cols-2 gap-2">
+                <button data-layout="horizontal" class="control-btn p-2 rounded-md active">Horizontal</button>
+                <button data-layout="vertical" class="control-btn p-2 rounded-md">Vertical</button>
+            </div>
+        </div>
+        
+        <div class="control-panel p-4 rounded-lg space-y-3">
+            <label for="base-unit-size" class="font-semibold text-lg">Base Unit Size</label>
+            <input type="number" id="base-unit-size" value="1" min="0.01" max="5" step="0.01" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="range" id="base-unit-slider" value="1" min="0.01" max="5" step="0.01">
+        </div>
+
+        <!-- Primary Value Controls -->
+        <div class="control-panel p-4 rounded-lg space-y-3">
+            <div class="flex justify-between items-center">
+                <label for="primary-value" class="font-semibold text-lg">Primary Value</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="primary-color" value="#818CF8">
+                </div>
+            </div>
+            <input type="number" id="primary-value" value="10" min="1" max="1000000" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input type="range" id="primary-slider" value="10" min="1" max="10000">
+        </div>
+
+        <!-- Comparison Controls -->
+        <div class="control-panel p-4 rounded-lg space-y-3">
+            <div class="flex items-center justify-between">
+                <label for="compare-checkbox" class="font-semibold text-lg">Compare</label>
+                <input type="checkbox" id="compare-checkbox" class="w-5 h-5 rounded text-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div id="comparison-controls" class="space-y-3 hidden">
+                <div class="flex justify-between items-center">
+                    <label for="comparison-value" class="font-semibold">Comparison Value</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="comparison-color" value="#F472B6">
+                    </div>
+                </div>
+                <input type="number" id="comparison-value" value="50" min="1" max="1000000" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="range" id="comparison-slider" value="50" min="1" max="10000">
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap" src="importmap.json"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
