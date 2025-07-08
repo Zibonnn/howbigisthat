@@ -12,6 +12,7 @@
     <!-- 3D Canvas -->
     <div id="canvas-container" class="w-full h-3/5 lg:h-full lg:w-3/4 relative">
         <h1 class="h1-title absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
+        <p class="kid-intro absolute top-16 left-6 text-lg text-white opacity-90 pointer-events-none" style="max-width: 400px;">Welcome! Pick shapes, colors, and numbers to see how big things can get. Try comparing two groups too!</p>
         <canvas id="visualization-canvas"></canvas>
     </div>
 
@@ -19,22 +20,22 @@
     <div class="sidebar-main">
         <div class="controls-panel">
             <div class="control-panel">
-                <h3 class="card-title">Display Mode</h3>
+                <h3 class="card-title">What do you want to see?</h3>
                 <div id="display-mode-selector" class="tabs">
-                    <button data-mode="single" class="tab-btn active">Single Object</button>
-                    <button data-mode="arrangement" class="tab-btn">Arrangement</button>
+                    <button data-mode="single" class="tab-btn active">One Shape</button>
+                    <button data-mode="arrangement" class="tab-btn">Lots of Shapes</button>
                 </div>
             </div>
             <div id="arrangement-panel" class="control-panel hidden">
-                <h3 class="card-title">Arrangement Type</h3>
+                <h3 class="card-title">How should we arrange them?</h3>
                 <div id="arrangement-type-selector" class="tabs">
-                    <button data-arrangement="grid" class="tab-btn active">Grid</button>
+                    <button data-arrangement="grid" class="tab-btn active">Rows & Columns</button>
                     <button data-arrangement="pyramid" class="tab-btn">Pyramid</button>
-                    <button data-arrangement="line" class="tab-btn">Line</button>
+                    <button data-arrangement="line" class="tab-btn">In a Line</button>
                 </div>
             </div>
             <div class="control-panel">
-                <h3 class="card-title">Shape</h3>
+                <h3 class="card-title">Pick a Shape</h3>
                 <div id="shape-selector" class="grid grid-cols-2 gap-2">
                     <button data-shape="cube" class="control-btn p-2 rounded-md active">Cube</button>
                     <button data-shape="sphere" class="control-btn p-2 rounded-md">Sphere</button>
@@ -43,73 +44,73 @@
                 </div>
             </div>
             <div id="layout-panel" class="control-panel">
-                <h3 class="card-title">Layout</h3>
+                <h3 class="card-title">How do you want to compare?</h3>
                 <div id="layout-selector" class="tabs">
-                    <button data-layout="horizontal" class="tab-btn active">Horizontal</button>
-                    <button data-layout="vertical" class="tab-btn">Vertical</button>
+                    <button data-layout="horizontal" class="tab-btn active">Side by Side</button>
+                    <button data-layout="vertical" class="tab-btn">One on Top</button>
                 </div>
             </div>
             <div class="control-panel">
-                <h3 class="card-title">Base Unit Size</h3>
+                <h3 class="card-title">How Big is Each Shape?</h3>
                 <div class="custom-stepper" id="base-unit-stepper">
-                    <button class="stepper-btn" id="base-unit-minus" aria-label="Decrease base unit size">-</button>
-                    <input type="number" class="stepper-value-input" id="base-unit-value" min="0.05" max="5" step="0.05" value="1.00" title="Base unit size" inputmode="decimal" />
-                    <button class="stepper-btn" id="base-unit-plus" aria-label="Increase base unit size">+</button>
+                    <button class="stepper-btn" id="base-unit-minus" aria-label="Make shapes smaller">-</button>
+                    <input type="number" class="stepper-value-input" id="base-unit-value" min="0.05" max="5" step="0.05" value="1.00" title="Size (like 1, 2, 3...)" inputmode="decimal" placeholder="Size" />
+                    <button class="stepper-btn" id="base-unit-plus" aria-label="Make shapes bigger">+</button>
                 </div>
-                <input type="range" id="base-unit-slider" value="1" min="0.05" max="5" step="0.05" title="Base unit size">
+                <input type="range" id="base-unit-slider" value="1" min="0.05" max="5" step="0.05" title="How big is each shape?">
             </div>
             <div class="control-panel">
-                <h3 class="card-title">Primary Value</h3>
+                <h3 class="card-title">How Many Shapes?</h3>
                 <div class="color-row" id="primary-color-row">
-                    <button class="color-swatch" data-color="#818CF8" title="#818CF8"></button>
-                    <button class="color-swatch" data-color="#F472B6" title="#F472B6"></button>
-                    <button class="color-swatch" data-color="#34D399" title="#34D399"></button>
-                    <button class="color-swatch" data-color="#FBBF24" title="#FBBF24"></button>
-                    <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
+                    <button class="color-swatch" data-color="#818CF8" title="Pick this color"></button>
+                    <button class="color-swatch" data-color="#F472B6" title="Pick this color"></button>
+                    <button class="color-swatch" data-color="#34D399" title="Pick this color"></button>
+                    <button class="color-swatch" data-color="#FBBF24" title="Pick this color"></button>
+                    <button class="color-swatch" data-color="#60A5FA" title="Pick this color"></button>
                     <div class="color-picker-wrapper">
-                        <input type="color" id="primary-color" value="#818CF8" title="Primary color">
+                        <input type="color" id="primary-color" value="#818CF8" title="Pick a color">
                     </div>
                 </div>
                 <div class="custom-stepper" id="primary-value-stepper">
-                    <button class="stepper-btn" id="primary-value-minus" aria-label="Decrease primary value">-</button>
-                    <input type="number" class="stepper-value-input" id="primary-value-value" min="1" max="1000000" step="1" value="10" title="Primary value" inputmode="numeric" />
-                    <button class="stepper-btn" id="primary-value-plus" aria-label="Increase primary value">+</button>
+                    <button class="stepper-btn" id="primary-value-minus" aria-label="Less shapes">-</button>
+                    <input type="number" class="stepper-value-input" id="primary-value-value" min="1" max="1000000" step="1" value="10" title="How many shapes?" inputmode="numeric" placeholder="How many?" />
+                    <button class="stepper-btn" id="primary-value-plus" aria-label="More shapes">+</button>
                 </div>
-                <input type="range" id="primary-slider" value="10" min="1" max="10000" title="Primary value">
+                <input type="range" id="primary-slider" value="10" min="1" max="10000" title="How many shapes?">
             </div>
             <div class="control-panel">
                 <div class="card-title-row">
-                    <h3 class="card-title">Compare</h3>
-                    <input type="checkbox" id="compare-checkbox" title="Enable comparison" />
+                    <h3 class="card-title">Compare with Another Group?</h3>
+                    <input type="checkbox" id="compare-checkbox" title="Show comparison" />
                 </div>
                 <div id="comparison-controls" class="hidden">
                     <div class="color-row" id="comparison-color-row">
-                        <button class="color-swatch" data-color="#818CF8" title="#818CF8"></button>
-                        <button class="color-swatch" data-color="#F472B6" title="#F472B6"></button>
-                        <button class="color-swatch" data-color="#34D399" title="#34D399"></button>
-                        <button class="color-swatch" data-color="#FBBF24" title="#FBBF24"></button>
-                        <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
+                        <button class="color-swatch" data-color="#818CF8" title="Pick this color for the other group"></button>
+                        <button class="color-swatch" data-color="#F472B6" title="Pick this color for the other group"></button>
+                        <button class="color-swatch" data-color="#34D399" title="Pick this color for the other group"></button>
+                        <button class="color-swatch" data-color="#FBBF24" title="Pick this color for the other group"></button>
+                        <button class="color-swatch" data-color="#60A5FA" title="Pick this color for the other group"></button>
                         <div class="color-picker-wrapper">
-                            <input type="color" id="comparison-color" value="#F472B6" title="Comparison color">
+                            <input type="color" id="comparison-color" value="#F472B6" title="Pick a color for the other group">
                         </div>
                     </div>
                     <div class="custom-stepper" id="comparison-value-stepper">
-                        <button class="stepper-btn" id="comparison-value-minus" aria-label="Decrease comparison value">-</button>
-                        <input type="number" class="stepper-value-input" id="comparison-value-value" min="1" max="1000000" step="1" value="50" title="Comparison value" inputmode="numeric" />
-                        <button class="stepper-btn" id="comparison-value-plus" aria-label="Increase comparison value">+</button>
+                        <button class="stepper-btn" id="comparison-value-minus" aria-label="Less shapes in the other group">-</button>
+                        <input type="number" class="stepper-value-input" id="comparison-value-value" min="1" max="1000000" step="1" value="50" title="How many in the other group?" inputmode="numeric" placeholder="How many?" />
+                        <button class="stepper-btn" id="comparison-value-plus" aria-label="More shapes in the other group">+</button>
                     </div>
-                    <input type="range" id="comparison-slider" value="50" min="1" max="10000" title="Comparison value">
+                    <input type="range" id="comparison-slider" value="50" min="1" max="10000" title="How many in the other group?">
                 </div>
             </div>
             <!-- Zoom Control Panel -->
             <div class="control-panel zoom-panel">
                 <div class="card-title-row">
-                    <h3 class="card-title">Zoom</h3>
+                    <h3 class="card-title">Zoom In & Out</h3>
                     <button id="reset-zoom-btn" title="Reset zoom" class="reset-zoom-btn">
                         <img src="assets/icons/dark/reset_dark.svg" alt="Reset zoom" width="20" height="20" />
                     </button>
                 </div>
-                <input type="range" id="zoom-slider" min="10" max="10000" value="30" step="1" title="Zoom level" class="flex-1">
+                <input type="range" id="zoom-slider" min="10" max="10000" value="30" step="1" title="Zoom in and out" class="flex-1">
             </div>
         </div>
     </div>
