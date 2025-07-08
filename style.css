@@ -78,8 +78,8 @@ body {
     border: 1.5px solid rgba(120, 120, 130, 0.18);
     border-radius: 18px;
     box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10);
-    margin-bottom: 1.1rem;
-    padding: 0.6rem 16px 1.1rem 16px;
+    margin-bottom: 0.5rem;
+    padding: 0 16px 1rem 16px;
     display: flex;
     flex-direction: column;
     gap: 0.7rem;
