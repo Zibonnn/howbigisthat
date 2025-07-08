@@ -16,7 +16,7 @@ const state = {
     comparisonColor: '#F472B6',
 };
 
-// --- 3D Scene Setup ---
+const DEFAULT_FOV = 50;
 let scene, camera, renderer, controls;
 let primaryObject, comparisonObject;
 const canvasContainer = document.getElementById('canvas-container');
@@ -28,7 +28,7 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000, 0);
 
-    camera = new THREE.PerspectiveCamera(50, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 5000);
+    camera = new THREE.PerspectiveCamera(DEFAULT_FOV, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 5000);
     camera.position.set(15, 10, 30);
     camera.lookAt(scene.position);
 
@@ -46,6 +46,24 @@ function init() {
     onWindowResize();
     animate();
     updateScene();
+    setupZoomControls();
+}
+
+function setupZoomControls() {
+    const zoomSlider = document.getElementById('zoom-slider');
+    const resetZoomBtn = document.getElementById('reset-zoom-btn');
+    if (!zoomSlider || !resetZoomBtn) return;
+    // Set initial slider value to match camera fov
+    zoomSlider.value = camera.fov;
+    zoomSlider.addEventListener('input', (e) => {
+        camera.fov = parseFloat(e.target.value);
+        camera.updateProjectionMatrix();
+    });
+    resetZoomBtn.addEventListener('click', () => {
+        camera.fov = DEFAULT_FOV;
+        camera.updateProjectionMatrix();
+        zoomSlider.value = DEFAULT_FOV;
+    });
 }
 
 function onWindowResize() {
