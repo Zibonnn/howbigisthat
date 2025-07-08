@@ -372,4 +372,21 @@ function setupCustomSteppers() {
 // --- Initialize ---
 init();
 setupEventListeners();
-setupCustomSteppers(); 
+setupCustomSteppers();
+
+// Restore Compare checkbox logic
+const compareCheckbox = document.getElementById('compare-checkbox');
+const comparisonControls = document.getElementById('comparison-controls');
+const layoutPanel = document.getElementById('layout-panel');
+if (compareCheckbox && comparisonControls && layoutPanel) {
+    function updateCompareUI() {
+        const checked = compareCheckbox.checked;
+        state.isComparing = checked;
+        comparisonControls.classList.toggle('hidden', !checked);
+        layoutPanel.classList.toggle('hidden', !checked);
+        updateScene();
+    }
+    compareCheckbox.addEventListener('change', updateCompareUI);
+    // Set initial state
+    updateCompareUI();
+} 
