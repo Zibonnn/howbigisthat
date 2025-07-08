@@ -231,7 +231,7 @@ function setupEventListeners() {
     document.getElementById('display-mode-selector').addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
             state.displayMode = e.target.dataset.mode;
-            document.querySelectorAll('#display-mode-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#display-mode-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             document.getElementById('arrangement-panel').classList.toggle('hidden', state.displayMode !== 'arrangement');
             updateScene();
@@ -240,7 +240,7 @@ function setupEventListeners() {
     document.getElementById('arrangement-type-selector').addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
             state.arrangementType = e.target.dataset.arrangement;
-            document.querySelectorAll('#arrangement-type-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#arrangement-type-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             updateScene();
         }
@@ -256,7 +256,7 @@ function setupEventListeners() {
     document.getElementById('layout-selector').addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
             state.layout = e.target.dataset.layout;
-            document.querySelectorAll('#layout-selector .control-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#layout-selector .tab-btn').forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
             positionObjects();
         }
