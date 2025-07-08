@@ -4,23 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How Big Is That</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="w-full h-screen m-0 p-0 flex flex-col lg:flex-row overflow-hidden">
 
     <!-- 3D Canvas -->
     <div id="canvas-container" class="w-full h-3/5 lg:h-full lg:w-3/4 relative">
-        <h1 class="fredoka-title absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
+        <h1 class="h1-title absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
         <canvas id="visualization-canvas"></canvas>
     </div>
 
     <!-- Controls -->
     <div class="w-full lg:w-1/4 h-2/5 lg:h-full p-4 overflow-y-auto flex flex-col space-y-4">
         
-        <div class="control-panel p-4 rounded-lg">
+        <div class="controls-panel">
             <h3 class="font-semibold mb-2 text-lg">Display Mode</h3>
             <div id="display-mode-selector" class="tabs">
                 <button data-mode="single" class="tab-btn active">Single Object</button>
