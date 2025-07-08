@@ -343,7 +343,79 @@ function setupColorSwatches() {
     });
 }
 
+// --- Custom Stepper Logic ---
+function setupCustomSteppers() {
+    // Base Unit Size
+    const baseMinus = document.getElementById('base-unit-minus');
+    const basePlus = document.getElementById('base-unit-plus');
+    const baseValue = document.getElementById('base-unit-value');
+    const baseSlider = document.getElementById('base-unit-slider');
+    function updateBaseUnit(val) {
+        state.baseUnitSize = Math.max(0.01, Math.min(5, parseFloat(val)));
+        baseValue.textContent = state.baseUnitSize.toFixed(2);
+        baseSlider.value = state.baseUnitSize;
+        updateScene();
+    }
+    baseMinus.addEventListener('click', () => {
+        updateBaseUnit((state.baseUnitSize - 0.01).toFixed(2));
+    });
+    basePlus.addEventListener('click', () => {
+        updateBaseUnit((state.baseUnitSize + 0.01).toFixed(2));
+    });
+    baseSlider.addEventListener('input', (e) => {
+        updateBaseUnit(e.target.value);
+    });
+    updateBaseUnit(state.baseUnitSize);
+
+    // Primary Value
+    const primaryMinus = document.getElementById('primary-value-minus');
+    const primaryPlus = document.getElementById('primary-value-plus');
+    const primaryValue = document.getElementById('primary-value-value');
+    const primarySlider = document.getElementById('primary-slider');
+    function updatePrimary(val) {
+        state.primaryValue = Math.max(1, Math.min(1000000, parseInt(val, 10)));
+        primaryValue.textContent = state.primaryValue;
+        primarySlider.value = state.primaryValue;
+        updateScene();
+    }
+    primaryMinus.addEventListener('click', () => {
+        updatePrimary(state.primaryValue - 1);
+    });
+    primaryPlus.addEventListener('click', () => {
+        updatePrimary(state.primaryValue + 1);
+    });
+    primarySlider.addEventListener('input', (e) => {
+        updatePrimary(e.target.value);
+    });
+    updatePrimary(state.primaryValue);
+
+    // Comparison Value
+    const comparisonMinus = document.getElementById('comparison-value-minus');
+    const comparisonPlus = document.getElementById('comparison-value-plus');
+    const comparisonValue = document.getElementById('comparison-value-value');
+    const comparisonSlider = document.getElementById('comparison-slider');
+    function updateComparison(val) {
+        state.comparisonValue = Math.max(1, Math.min(1000000, parseInt(val, 10)));
+        comparisonValue.textContent = state.comparisonValue;
+        comparisonSlider.value = state.comparisonValue;
+        updateScene();
+    }
+    if (comparisonMinus && comparisonPlus && comparisonValue && comparisonSlider) {
+        comparisonMinus.addEventListener('click', () => {
+            updateComparison(state.comparisonValue - 1);
+        });
+        comparisonPlus.addEventListener('click', () => {
+            updateComparison(state.comparisonValue + 1);
+        });
+        comparisonSlider.addEventListener('input', (e) => {
+            updateComparison(e.target.value);
+        });
+        updateComparison(state.comparisonValue);
+    }
+}
+
 // --- Initialize ---
 init();
 setupEventListeners();
+setupCustomSteppers();
 }); 
