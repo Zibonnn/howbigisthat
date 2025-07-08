@@ -118,10 +118,49 @@ function animate() {
 // --- Core Logic ---
 function getUnitGeometry(shapeType, size = 1) {
     switch (shapeType) {
-        case 'sphere': return new THREE.SphereGeometry(size / 2, 16, 16);
-        case 'cylinder': return new THREE.CylinderGeometry(size / 2, size / 2, size, 16);
-        case 'cone': return new THREE.ConeGeometry(size / 2, size, 16);
-        case 'cube': default: return new THREE.BoxGeometry(size, size, size);
+        case 'sphere':
+            return new THREE.SphereGeometry(size / 2, 16, 16);
+        case 'cylinder':
+            return new THREE.CylinderGeometry(size / 2, size / 2, size, 16);
+        case 'cone':
+            return new THREE.ConeGeometry(size / 2, size, 16);
+        case 'cube':
+            return new THREE.BoxGeometry(size, size, size);
+        case 'pyramid': // square base
+            return new THREE.ConeGeometry(size / 2, size, 4);
+        case 'torus':
+            return new THREE.TorusGeometry(size / 2, size / 6, 16, 32);
+        case 'rectangularprism':
+            return new THREE.BoxGeometry(size, size * 0.6, size * 0.4);
+        case 'triangularprism': {
+            // Approximate with a custom geometry
+            const shape = new THREE.Shape();
+            shape.moveTo(-size/2, -size/2);
+            shape.lineTo(size/2, -size/2);
+            shape.lineTo(0, size/2);
+            shape.lineTo(-size/2, -size/2);
+            const extrudeSettings = { depth: size * 0.6, bevelEnabled: false };
+            return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        }
+        case 'octahedron':
+            return new THREE.OctahedronGeometry(size / 2);
+        case 'dodecahedron':
+            return new THREE.DodecahedronGeometry(size / 2);
+        case 'icosahedron':
+            return new THREE.IcosahedronGeometry(size / 2);
+        case 'tetrahedron':
+            return new THREE.TetrahedronGeometry(size / 2);
+        case 'ellipsoid':
+            return new THREE.SphereGeometry(size / 2, 16, 16).scale(1, 0.7, 1.3);
+        case 'capsule':
+            if (THREE.CapsuleGeometry) {
+                return new THREE.CapsuleGeometry(size / 2, size / 2, 8, 16);
+            } else {
+                // fallback to sphere
+                return new THREE.SphereGeometry(size / 2, 16, 16);
+            }
+        default:
+            return new THREE.BoxGeometry(size, size, size);
     }
 }
 
@@ -214,16 +253,22 @@ function positionObjects() {
 
     const gap = 4 * state.baseUnitSize;
 
+    // Align to bottom (y=0)
+    const primaryBottom = primaryBox.min.y;
+    const comparisonBottom = comparisonBox.min.y;
+    // Shift so bottoms are at y=0
+    primaryObject.position.y -= primaryBottom;
+    comparisonObject.position.y -= comparisonBottom;
+
     if (state.layout === 'horizontal') {
         const totalWidth = primarySize.x + comparisonSize.x + gap;
         primaryObject.position.x = -totalWidth / 2 + primarySize.x / 2;
         comparisonObject.position.x = totalWidth / 2 - comparisonSize.x / 2;
-        primaryObject.position.y = 0;
-        comparisonObject.position.y = 0;
+        // y already set to 0 (bottom aligned)
     } else { // Vertical
         const totalHeight = primarySize.y + comparisonSize.y + gap;
-        primaryObject.position.y = -totalHeight / 2 + primarySize.y / 2;
-        comparisonObject.position.y = totalHeight / 2 - comparisonSize.y / 2;
+        primaryObject.position.y = 0; // bottom aligned
+        comparisonObject.position.y = comparisonSize.y + gap; // above primary
         primaryObject.position.x = 0;
         comparisonObject.position.x = 0;
     }
@@ -402,4 +447,26 @@ if (compareCheckbox && comparisonControls && layoutPanel) {
     compareCheckbox.addEventListener('change', updateCompareUI);
     // Set initial state
     updateCompareUI();
+} 
+
+// --- Mobile sidebar toggle ---
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const mobileCloseBtn = document.getElementById('mobile-close-btn');
+const sidebarMain = document.querySelector('.sidebar-main');
+if (mobileMenuBtn && mobileCloseBtn && sidebarMain) {
+    mobileMenuBtn.addEventListener('click', () => {
+        sidebarMain.classList.add('active');
+        sidebarMain.classList.remove('mobile-hidden');
+    });
+    mobileCloseBtn.addEventListener('click', () => {
+        sidebarMain.classList.remove('active');
+        sidebarMain.classList.add('mobile-hidden');
+    });
+    // Optional: close sidebar if user clicks outside controls-panel
+    sidebarMain.addEventListener('click', (e) => {
+        if (window.innerWidth < 1024 && e.target === sidebarMain) {
+            sidebarMain.classList.remove('active');
+            sidebarMain.classList.add('mobile-hidden');
+        }
+    });
 } 
