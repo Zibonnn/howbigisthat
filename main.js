@@ -323,7 +323,7 @@ function setupEventListeners() {
 function setupColorSwatches() {
     // Primary
     const primaryColorInput = document.getElementById('primary-color');
-    document.querySelectorAll('#primary-swatches .color-swatch').forEach(btn => {
+    document.querySelectorAll('#primary-color-row .color-swatch').forEach(btn => {
         btn.addEventListener('click', () => {
             const color = btn.getAttribute('data-color');
             primaryColorInput.value = color;
@@ -333,7 +333,7 @@ function setupColorSwatches() {
     });
     // Comparison
     const comparisonColorInput = document.getElementById('comparison-color');
-    document.querySelectorAll('#comparison-swatches .color-swatch').forEach(btn => {
+    document.querySelectorAll('#comparison-color-row .color-swatch').forEach(btn => {
         btn.addEventListener('click', () => {
             const color = btn.getAttribute('data-color');
             comparisonColorInput.value = color;

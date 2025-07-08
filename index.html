@@ -56,16 +56,14 @@
             </div>
             <div class="control-panel">
                 <h3 class="card-title">Primary Value</h3>
-                <div class="flex justify-between items-center">
+                <div class="color-row" id="primary-color-row">
+                    <button class="color-swatch" data-color="#818CF8" title="#818CF8"></button>
+                    <button class="color-swatch" data-color="#F472B6" title="#F472B6"></button>
+                    <button class="color-swatch" data-color="#34D399" title="#34D399"></button>
+                    <button class="color-swatch" data-color="#FBBF24" title="#FBBF24"></button>
+                    <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
                     <div class="color-picker-wrapper">
                         <input type="color" id="primary-color" value="#818CF8" title="Primary color">
-                    </div>
-                    <div class="color-swatches" id="primary-swatches">
-                        <button class="color-swatch" data-color="#818CF8" title="#818CF8"></button>
-                        <button class="color-swatch" data-color="#F472B6" title="#F472B6"></button>
-                        <button class="color-swatch" data-color="#34D399" title="#34D399"></button>
-                        <button class="color-swatch" data-color="#FBBF24" title="#FBBF24"></button>
-                        <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
                     </div>
                 </div>
                 <input type="number" id="primary-value" value="10" min="1" max="1000000" placeholder="Primary value" title="Primary value">
@@ -77,17 +75,15 @@
                     <label for="compare-checkbox">Compare</label>
                     <input type="checkbox" id="compare-checkbox">
                 </div>
-                <div id="comparison-controls" class="space-y-3 hidden">
-                    <div class="flex justify-between items-center">
+                <div id="comparison-controls" class="hidden">
+                    <div class="color-row" id="comparison-color-row">
+                        <button class="color-swatch" data-color="#818CF8" title="#818CF8"></button>
+                        <button class="color-swatch" data-color="#F472B6" title="#F472B6"></button>
+                        <button class="color-swatch" data-color="#34D399" title="#34D399"></button>
+                        <button class="color-swatch" data-color="#FBBF24" title="#FBBF24"></button>
+                        <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
                         <div class="color-picker-wrapper">
                             <input type="color" id="comparison-color" value="#F472B6" title="Comparison color">
-                        </div>
-                        <div class="color-swatches" id="comparison-swatches">
-                            <button class="color-swatch" data-color="#818CF8" title="#818CF8"></button>
-                            <button class="color-swatch" data-color="#F472B6" title="#F472B6"></button>
-                            <button class="color-swatch" data-color="#34D399" title="#34D399"></button>
-                            <button class="color-swatch" data-color="#FBBF24" title="#FBBF24"></button>
-                            <button class="color-swatch" data-color="#60A5FA" title="#60A5FA"></button>
                         </div>
                     </div>
                     <input type="number" id="comparison-value" value="50" min="1" max="1000000" placeholder="Comparison value" title="Comparison value">

@@ -210,12 +210,6 @@ input[type="color"]::-moz-color-swatch {
     border-radius: 50%;
     border: none;
 }
-.color-swatches {
-    display: flex;
-    gap: 0.3rem;
-    margin-top: 0.3rem;
-    margin-bottom: 0.3rem;
-}
 .color-swatch {
     width: 24px;
     height: 24px;
@@ -263,4 +257,11 @@ label {
     color: #bfc2d4;
     font-weight: 500;
     margin-bottom: 0.2rem;
+}
+.color-row {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
 } 
