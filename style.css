@@ -337,13 +337,13 @@ label {
     background: #23232b;
     box-shadow: 0 2px 8px 0 rgba(99,102,241,0.10);
 } 
-/* Remove number input spinners for .no-spinner */
-input.no-spinner::-webkit-outer-spin-button,
-input.no-spinner::-webkit-inner-spin-button {
+/* Hide native number input spinners for custom steppers */
+.stepper-value-input::-webkit-outer-spin-button,
+.stepper-value-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-input.no-spinner[type=number] {
+.stepper-value-input[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
 } 
