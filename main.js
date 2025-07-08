@@ -12,12 +12,19 @@ window.addEventListener('DOMContentLoaded', function () {
     const scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0.07, 0.09, 0.15, 1.0); // match dark bg
 
+    // Add environment texture for realistic reflections/refractions
+    scene.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("https://playground.babylonjs.com/textures/environment.env", scene);
+
+    // Add a directional light for more dramatic shading
+    const dirLight = new BABYLON.DirectionalLight('dirLight', new BABYLON.Vector3(-1, -2, -1), scene);
+    dirLight.intensity = 0.4;
+
     // Camera
     const camera = new BABYLON.ArcRotateCamera('camera', Math.PI / 4, Math.atan(Math.sqrt(2)), 10, BABYLON.Vector3.Zero(), scene);
     camera.attachControl(canvas, true);
     camera.wheelDeltaPercentage = 0.01;
-    camera.lowerRadiusLimit = 2;
-    camera.upperRadiusLimit = 100;
+    camera.lowerRadiusLimit = 1;
+    camera.upperRadiusLimit = 10000;
 
     // Light
     const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(0, 1, 0), scene);
@@ -38,6 +45,16 @@ window.addEventListener('DOMContentLoaded', function () {
     let groupMeshes = [];
 
     // --- Material Factories ---
+    function blendColor(color, blendWith, factor) {
+        // Blend two hex colors (factor 0-1)
+        const c1 = BABYLON.Color3.FromHexString(color);
+        const c2 = BABYLON.Color3.FromHexString(blendWith);
+        return new BABYLON.Color3(
+            c1.r * (1 - factor) + c2.r * factor,
+            c1.g * (1 - factor) + c2.g * factor,
+            c1.b * (1 - factor) + c2.b * factor
+        );
+    }
     function makeCartoonMaterial(color) {
         const mat = new BABYLON.StandardMaterial('cartoon', scene);
         mat.diffuseColor = BABYLON.Color3.FromHexString(color);
@@ -57,8 +74,47 @@ window.addEventListener('DOMContentLoaded', function () {
         mat.diffuseFresnelParameters.rightColor = BABYLON.Color3.FromHexString(color).scale(0.7);
         return mat;
     }
+    function makeGlassMaterial(color) {
+        const mat = new BABYLON.PBRMaterial('glass', scene);
+        mat.albedoColor = blendColor(color, '#ffffff', 0.7); // mostly white
+        mat.metallic = 0.0;
+        mat.roughness = 0.05;
+        mat.alpha = 0.3;
+        mat.indexOfRefraction = 1.5;
+        mat.subSurface.isRefractionEnabled = true;
+        mat.environmentIntensity = 1.0;
+        return mat;
+    }
+    function makeMetalMaterial(color) {
+        const mat = new BABYLON.PBRMaterial('metal', scene);
+        mat.albedoColor = blendColor(color, '#cccccc', 0.5); // blend with gray
+        mat.metallic = 1.0;
+        mat.roughness = 0.2;
+        mat.environmentIntensity = 1.0;
+        return mat;
+    }
+    function makeRockMaterial(color) {
+        const mat = new BABYLON.PBRMaterial('rock', scene);
+        mat.albedoColor = blendColor(color, '#888888', 0.3); // blend with gray
+        mat.metallic = 0.0;
+        mat.roughness = 0.9;
+        try {
+            mat.albedoTexture = new BABYLON.Texture('assets/textures/rock.jpg', scene);
+            mat.bumpTexture = new BABYLON.Texture('assets/textures/rockn.jpg', scene);
+        } catch (e) {
+            console.warn('Rock texture not found, using color only.');
+        }
+        return mat;
+    }
     function getMaterial(color) {
-        return currentMaterial === 'cartoon' ? makeCartoonMaterial(color) : makeGradientMaterial(color);
+        switch (currentMaterial) {
+            case 'cartoon': return makeCartoonMaterial(color);
+            case 'gradient': return makeGradientMaterial(color);
+            case 'glass': return makeGlassMaterial(color);
+            case 'metal': return makeMetalMaterial(color);
+            case 'rock': return makeRockMaterial(color);
+            default: return makeCartoonMaterial(color);
+        }
     }
 
     // --- Shape creation ---
@@ -109,26 +165,21 @@ window.addEventListener('DOMContentLoaded', function () {
                 mesh.position.set(col * step, size / 2, row * step);
             }
         } else if (arrangement === 'pyramid') {
-            // Compute the number of layers needed for the given count
-            let layers = 0;
-            let total = 0;
+            // Classic pyramid: top layer 1x1, next 2x2, ..., bottom nxn, then fill (n+1)x(n+1) with leftovers
+            let total = 0, layers = 0;
             while (total + (layers + 1) * (layers + 1) <= count) {
                 layers++;
                 total += layers * layers;
             }
-            // If not a perfect pyramid, the last layer will have fewer shapes
             let countPlaced = 0;
             let y = 0;
             let minY = Infinity;
-            for (let level = 0; countPlaced < count; level++) {
-                let layerSize = layers - level;
-                if (layerSize <= 0) layerSize = 1;
-                // If this is the last layer and not full, adjust layerSize
-                if (count - countPlaced < layerSize * layerSize) {
-                    layerSize = Math.ceil(Math.sqrt(count - countPlaced));
-                }
-                for (let x = 0; x < layerSize && countPlaced < count; x++) {
-                    for (let z = 0; z < layerSize && countPlaced < count; z++) {
+            // Build all full layers from 1x1 up to nxn
+            for (let level = 1; level <= layers; level++) {
+                const layerSize = level;
+                for (let x = 0; x < layerSize; x++) {
+                    for (let z = 0; z < layerSize; z++) {
+                        if (countPlaced >= count) break;
                         const mesh = createShape(type, size, color);
                         mesh.parent = group;
                         mesh.position.set(
@@ -141,6 +192,21 @@ window.addEventListener('DOMContentLoaded', function () {
                     }
                 }
                 y += step;
+            }
+            // If there are leftovers, fill the next (n+1)x(n+1) layer
+            const nextLayerSize = layers + 1;
+            for (let x = 0; x < nextLayerSize && countPlaced < count; x++) {
+                for (let z = 0; z < nextLayerSize && countPlaced < count; z++) {
+                    const mesh = createShape(type, size, color);
+                    mesh.parent = group;
+                    mesh.position.set(
+                        (x - (nextLayerSize - 1) / 2) * step,
+                        y,
+                        (z - (nextLayerSize - 1) / 2) * step
+                    );
+                    if (mesh.position.y < minY) minY = mesh.position.y;
+                    countPlaced++;
+                }
             }
             group.position.y = -minY;
         }
@@ -190,13 +256,34 @@ window.addEventListener('DOMContentLoaded', function () {
                 meshB = createArrangement(currentShape, currentSize, comparisonColor, currentArrangement, comparisonCount);
             }
             if (meshA && meshB) {
+                // Ensure bounding info is up to date for both groups
+                if (typeof meshA.refreshBoundingInfo === 'function') meshA.refreshBoundingInfo(true);
+                if (typeof meshB.refreshBoundingInfo === 'function') meshB.refreshBoundingInfo(true);
+                meshA.computeWorldMatrix(true);
+                meshB.computeWorldMatrix(true);
+                const boxA = meshA.getBoundingInfo().boundingBox;
+                const boxB = meshB.getBoundingInfo().boundingBox;
                 if (comparisonLayout === 'horizontal') {
-                    meshA.position.x = -currentSize * 2.5;
-                    meshB.position.x = currentSize * 2.5;
-                    meshA.position.y = meshB.position.y = currentSize / 2;
+                    const minA = boxA.minimumWorld.x, maxA = boxA.maximumWorld.x;
+                    const minB = boxB.minimumWorld.x, maxB = boxB.maximumWorld.x;
+                    const widthA = maxA - minA;
+                    const widthB = maxB - minB;
+                    const gap = 0.2 * Math.max(widthA, widthB);
+                    // Place meshA so its right edge is at -(gap/2)
+                    meshA.position.x += -(maxA + gap/2);
+                    // Place meshB so its left edge is at +(gap/2)
+                    meshB.position.x += -minB + gap/2;
+                    meshA.position.y = meshB.position.y = 0;
                 } else {
-                    meshA.position.y = currentSize / 2;
-                    meshB.position.y = currentSize * 2.5;
+                    const minA = boxA.minimumWorld.y, maxA = boxA.maximumWorld.y;
+                    const minB = boxB.minimumWorld.y, maxB = boxB.maximumWorld.y;
+                    const heightA = maxA - minA;
+                    const heightB = maxB - minB;
+                    const gap = 0.2 * Math.max(heightA, heightB);
+                    // Place meshA so its top edge is at -(gap/2)
+                    meshA.position.y += -(maxA + gap/2);
+                    // Place meshB so its bottom edge is at +(gap/2)
+                    meshB.position.y += -minB + gap/2;
                     meshA.position.x = meshB.position.x = 0;
                 }
                 groupMeshes.push(meshA, meshB);
@@ -209,7 +296,7 @@ window.addEventListener('DOMContentLoaded', function () {
     function setIsometricView() {
         camera.alpha = Math.PI / 4;
         camera.beta = Math.atan(Math.sqrt(2));
-        camera.radius = 10;
+        // Do NOT reset camera.radius here (leave zoom unchanged)
         camera.target = BABYLON.Vector3.Zero();
     }
     let resetViewBtn = document.getElementById('reset-view-btn');
@@ -416,6 +503,15 @@ window.addEventListener('DOMContentLoaded', function () {
     const comparisonSlider = document.getElementById('comparison-slider');
     const comparisonMinus = document.getElementById('comparison-value-minus');
     const comparisonPlus = document.getElementById('comparison-value-plus');
+    function updateComparisonValue(val) {
+        let v = parseInt(val, 10);
+        if (isNaN(v)) v = 50;
+        v = Math.max(1, Math.min(1000000, v));
+        comparisonCount = v;
+        if (comparisonValueInput) comparisonValueInput.value = v;
+        if (comparisonSlider) comparisonSlider.value = v;
+        updateSceneBabylon();
+    }
     if (comparisonValueInput) {
         comparisonValueInput.addEventListener('input', e => updateComparisonValue(e.target.value));
     }
