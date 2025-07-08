@@ -35,8 +35,13 @@ function init() {
     camera.position.set(15, 10, DEFAULT_CAMERA_DISTANCE);
     camera.lookAt(scene.position);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // Ambient and fill lights for realism
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
+    const fillLight1 = new THREE.AmbientLight(0x404040, 0.6); // soft gray
+    scene.add(fillLight1);
+    const fillLight2 = new THREE.AmbientLight(0x222244, 0.3); // blueish
+    scene.add(fillLight2);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
     directionalLight.position.set(15, 25, 10);
     scene.add(directionalLight);
@@ -53,6 +58,7 @@ function init() {
     animate();
     updateScene();
     setupZoomControls();
+    setupColorSwatches();
 }
 
 function getCameraDistance() {
@@ -313,6 +319,29 @@ function setupEventListeners() {
     
     // Initial state for hidden panels
     document.getElementById('layout-panel').classList.toggle('hidden', !state.isComparing);
+}
+
+function setupColorSwatches() {
+    // Primary
+    const primaryColorInput = document.getElementById('primary-color');
+    document.querySelectorAll('#primary-swatches .color-swatch').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const color = btn.getAttribute('data-color');
+            primaryColorInput.value = color;
+            state.primaryColor = color;
+            updateScene();
+        });
+    });
+    // Comparison
+    const comparisonColorInput = document.getElementById('comparison-color');
+    document.querySelectorAll('#comparison-swatches .color-swatch').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const color = btn.getAttribute('data-color');
+            comparisonColorInput.value = color;
+            state.comparisonColor = color;
+            updateScene();
+        });
+    });
 }
 
 // --- Initialize ---

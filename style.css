@@ -165,4 +165,47 @@ input[type="color"]::-webkit-color-swatch {
 input[type="color"]::-moz-color-swatch {
     border-radius: 50%;
     border: none;
+}
+.color-swatches {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #23232b;
+    outline: none;
+    cursor: pointer;
+    transition: border 0.15s, box-shadow 0.15s;
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.10);
+    padding: 0;
+}
+.color-swatch:focus, .color-swatch:hover {
+    border: 2px solid #818CF8;
+    box-shadow: 0 2px 8px 0 rgba(99,102,241,0.15);
+}
+
+/* Section titles and tab labels smaller */
+.control-panel h3,
+.tabs .tab-btn {
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+.tabs .tab-btn {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+    font-size: 0.95rem;
+}
+/* Number input and value font larger */
+input[type="number"],
+input[type="range"] + label,
+#primary-value,
+#comparison-value {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 } 
