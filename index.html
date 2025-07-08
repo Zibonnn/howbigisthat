@@ -12,13 +12,18 @@
     <!-- 3D Canvas -->
     <div id="canvas-container" class="w-full h-3/5 lg:h-full lg:w-3/4 relative">
         <h1 class="h1-title absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
-        <p class="kid-intro absolute top-16 left-6 text-lg text-white opacity-90 pointer-events-none" style="max-width: 400px;">Welcome! Pick shapes, colors, and numbers to see how big things can get. Try comparing two groups too!</p>
         <canvas id="visualization-canvas"></canvas>
     </div>
 
     <!-- Controls -->
     <div class="sidebar-main">
         <div class="controls-panel">
+            <div id="intro-card" class="control-panel intro-card" style="display:none; position:relative;">
+                <button id="intro-dismiss" aria-label="Close intro" style="position:absolute; top:8px; right:12px; background:none; border:none; color:#bfc2d4; font-size:1.5rem; cursor:pointer;">&times;</button>
+                <div style="padding-right:2rem;">
+                    <strong>Welcome!</strong> Pick shapes, colors, and numbers to see how big things can get. Try comparing two groups too!
+                </div>
+            </div>
             <div class="control-panel">
                 <h3 class="card-title">What do you want to see?</h3>
                 <div id="display-mode-selector" class="tabs">

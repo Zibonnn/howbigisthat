@@ -374,6 +374,19 @@ init();
 setupEventListeners();
 setupCustomSteppers();
 
+// Show/hide intro card based on localStorage
+const introCard = document.getElementById('intro-card');
+const introDismiss = document.getElementById('intro-dismiss');
+if (introCard && introDismiss) {
+    if (!localStorage.getItem('howbigisthat_intro_dismissed')) {
+        introCard.style.display = '';
+    }
+    introDismiss.addEventListener('click', () => {
+        introCard.style.display = 'none';
+        localStorage.setItem('howbigisthat_intro_dismissed', '1');
+    });
+}
+
 // Restore Compare checkbox logic
 const compareCheckbox = document.getElementById('compare-checkbox');
 const comparisonControls = document.getElementById('comparison-controls');
