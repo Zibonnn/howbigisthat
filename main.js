@@ -256,36 +256,98 @@ window.addEventListener('DOMContentLoaded', function () {
                 meshB = createArrangement(currentShape, currentSize, comparisonColor, currentArrangement, comparisonCount);
             }
             if (meshA && meshB) {
-                // Ensure bounding info is up to date for both groups
-                if (typeof meshA.refreshBoundingInfo === 'function') meshA.refreshBoundingInfo(true);
-                if (typeof meshB.refreshBoundingInfo === 'function') meshB.refreshBoundingInfo(true);
-                meshA.computeWorldMatrix(true);
-                meshB.computeWorldMatrix(true);
-                const boxA = meshA.getBoundingInfo().boundingBox;
-                const boxB = meshB.getBoundingInfo().boundingBox;
-                if (comparisonLayout === 'horizontal') {
-                    const minA = boxA.minimumWorld.x, maxA = boxA.maximumWorld.x;
-                    const minB = boxB.minimumWorld.x, maxB = boxB.maximumWorld.x;
-                    const widthA = maxA - minA;
-                    const widthB = maxB - minB;
-                    const gap = 0.2 * Math.max(widthA, widthB);
-                    // Place meshA so its right edge is at -(gap/2)
-                    meshA.position.x += -(maxA + gap/2);
-                    // Place meshB so its left edge is at +(gap/2)
-                    meshB.position.x += -minB + gap/2;
-                    meshA.position.y = meshB.position.y = 0;
-                } else {
-                    const minA = boxA.minimumWorld.y, maxA = boxA.maximumWorld.y;
-                    const minB = boxB.minimumWorld.y, maxB = boxB.maximumWorld.y;
-                    const heightA = maxA - minA;
-                    const heightB = maxB - minB;
-                    const gap = 0.2 * Math.max(heightA, heightB);
-                    // Place meshA so its top edge is at -(gap/2)
-                    meshA.position.y += -(maxA + gap/2);
-                    // Place meshB so its bottom edge is at +(gap/2)
-                    meshB.position.y += -minB + gap/2;
-                    meshA.position.x = meshB.position.x = 0;
+                // Force update world matrices and bounding info
+                scene.registerBeforeRender(() => {
+                    meshA.computeWorldMatrix(true);
+                    meshB.computeWorldMatrix(true);
+                });
+                scene.render(); // Force one render to update matrices
+                
+                // Calculate bounding boxes more reliably
+                const getBoundingInfo = (mesh) => {
+                    if (mesh.getChildMeshes) {
+                        // For arrangements (TransformNode), get combined bounds of all children
+                        const children = mesh.getChildMeshes();
+                        if (children.length === 0) return null;
+                        
+                        let minX = Infinity, maxX = -Infinity;
+                        let minY = Infinity, maxY = -Infinity;
+                        let minZ = Infinity, maxZ = -Infinity;
+                        
+                        children.forEach(child => {
+                            child.computeWorldMatrix(true);
+                            const bounds = child.getBoundingInfo().boundingBox;
+                            const min = bounds.minimumWorld;
+                            const max = bounds.maximumWorld;
+                            
+                            minX = Math.min(minX, min.x);
+                            maxX = Math.max(maxX, max.x);
+                            minY = Math.min(minY, min.y);
+                            maxY = Math.max(maxY, max.y);
+                            minZ = Math.min(minZ, min.z);
+                            maxZ = Math.max(maxZ, max.z);
+                        });
+                        
+                        return {
+                            min: { x: minX, y: minY, z: minZ },
+                            max: { x: maxX, y: maxY, z: maxZ },
+                            width: maxX - minX,
+                            height: maxY - minY,
+                            depth: maxZ - minZ
+                        };
+                    } else {
+                        // For single shapes, use standard bounding box
+                        mesh.computeWorldMatrix(true);
+                        const bounds = mesh.getBoundingInfo().boundingBox;
+                        return {
+                            min: bounds.minimumWorld,
+                            max: bounds.maximumWorld,
+                            width: bounds.maximumWorld.x - bounds.minimumWorld.x,
+                            height: bounds.maximumWorld.y - bounds.minimumWorld.y,
+                            depth: bounds.maximumWorld.z - bounds.minimumWorld.z
+                        };
+                    }
+                };
+                
+                const boundsA = getBoundingInfo(meshA);
+                const boundsB = getBoundingInfo(meshB);
+                
+                if (boundsA && boundsB) {
+                    if (comparisonLayout === 'horizontal') {
+                        // Horizontal layout: place side by side
+                        const totalWidth = boundsA.width + boundsB.width;
+                        const gap = Math.max(currentSize * 2, totalWidth * 0.3); // Minimum gap of 2x base size
+                        
+                        // Center meshA to the left
+                        meshA.position.x = -(boundsA.width / 2 + gap / 2);
+                        // Center meshB to the right  
+                        meshB.position.x = boundsB.width / 2 + gap / 2;
+                        
+                        // Align both to ground level
+                        meshA.position.y = -boundsA.min.y;
+                        meshB.position.y = -boundsB.min.y;
+                        
+                        // Center both on Z axis
+                        meshA.position.z = 0;
+                        meshB.position.z = 0;
+                    } else {
+                        // Vertical layout: stack one on top
+                        const totalHeight = boundsA.height + boundsB.height;
+                        const gap = Math.max(currentSize * 1.5, totalHeight * 0.2); // Minimum gap of 1.5x base size
+                        
+                        // Place meshA on bottom, align to ground
+                        meshA.position.y = -boundsA.min.y;
+                        // Place meshB on top with gap
+                        meshB.position.y = boundsA.height + gap - boundsB.min.y;
+                        
+                        // Center both on X and Z axes
+                        meshA.position.x = 0;
+                        meshB.position.x = 0;
+                        meshA.position.z = 0;
+                        meshB.position.z = 0;
+                    }
                 }
+                
                 groupMeshes.push(meshA, meshB);
             }
         }
