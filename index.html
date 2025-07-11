@@ -3,156 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How Big Is That</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Scale Explorer - Comparison Playground</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/6.0.0/babylon.min.js"></script>
 </head>
-<body class="main-flex h-screen m-0 p-0 overflow-hidden">
-    <!-- Mobile menu button -->
-    <button id="mobile-menu-btn" aria-label="Show controls" style="position:fixed;top:16px;left:16px;z-index:50;display:none;font-size:2rem;background:none;border:none;color:#fff;cursor:pointer;">&#9776;</button>
-    <!-- 3D Canvas -->
-    <div id="canvas-container" class="relative">
-        <h1 class="h1-title absolute top-4 left-6 text-3xl text-white opacity-80 pointer-events-none">How Big Is That</h1>
-        <canvas id="visualization-canvas"></canvas>
-        <!-- Material Picker and Reset View Button (in-canvas UI) -->
-        <div id="canvas-ui" style="position:absolute;top:16px;right:16px;z-index:52;display:flex;gap:12px;align-items:center;">
-            <button id="reset-view-btn" title="Reset view to isometric" style="background:none;border:none;color:#fff;cursor:pointer;font-size:2rem;padding:0;">
-                <svg width="28" height="28" viewBox="0 0 28 28"><g stroke="#fff" stroke-width="2" fill="none"><polygon points="14,4 24,10 24,20 14,26 4,20 4,10"/><path d="M14 4V14L24 10"/></g></svg>
-            </button>
-            <select id="material-picker" title="Pick a material" style="background:#23232b;color:#fff;border-radius:8px;padding:4px 12px;font-size:1rem;border:1.2px solid #35354a;">
-                <option value="cartoon">Cartoon</option>
-                <option value="gradient">Gradient</option>
-                <option value="glass">Glass</option>
-                <option value="metal">Metal</option>
-                <option value="rock">Rock</option>
-            </select>
+<body>
+    <div id="app-container">
+        <!-- 3D Canvas Area -->
+        <div id="canvas-container">
+            <canvas id="babylon-canvas"></canvas>
+            <div id="comparison-feedback">
+                <span id="feedback-text" class="body-m">Click shapes and numbers to start comparing!</span>
+            </div>
         </div>
-    </div>
-    <!-- Controls -->
-    <div class="sidebar-main mobile-hidden">
-        <button id="mobile-close-btn" aria-label="Close controls" style="position:absolute;top:16px;right:16px;z-index:51;display:none;font-size:2rem;background:none;border:none;color:#fff;cursor:pointer;">&times;</button>
-        <div class="controls-panel">
-            <div id="intro-card" class="control-panel intro-card" style="display:none; position:relative;">
-                <button id="intro-dismiss" aria-label="Close intro" style="position:absolute; top:8px; right:12px; background:none; border:none; color:#bfc2d4; font-size:1.5rem; cursor:pointer;">&times;</button>
-                <div style="padding-right:2rem;">
-                    <strong>Welcome!</strong> Pick shapes, colors, and numbers to see how big things can get. Try comparing two groups too!
-                </div>
-            </div>
-            <div class="control-panel">
-                <h3 class="card-title">Display Mode</h3>
-                <div id="display-mode-selector" class="tabs">
-                    <button data-mode="single" class="tab-btn active">Single Object</button>
-                    <button data-mode="arrangement" class="tab-btn">Arrangement</button>
-        </div>
-            </div>
-            <div id="arrangement-panel" class="control-panel hidden">
-                <h3 class="card-title">How should we arrange them?</h3>
-                <div id="arrangement-type-selector" class="tabs">
-                    <button data-arrangement="grid" class="tab-btn active">Rows & Columns</button>
-                    <button data-arrangement="pyramid" class="tab-btn">Pyramid</button>
-                    <button data-arrangement="line" class="tab-btn">In a Line</button>
-        </div>
-            </div>
-            <div class="control-panel">
-                <h3 class="card-title">Pick a Shape</h3>
-                <div id="shape-selector" class="grid grid-cols-3 gap-2">
-                    <button data-shape="sphere" class="control-btn p-2 rounded-md active" aria-label="Sphere">
-                        <img src="assets/shapes/sphere.avif" width="32" height="32" alt="Sphere icon" />
-                        <div class="shape-label">Sphere</div>
+        
+        <!-- Control Panel -->
+        <div id="control-panel">
+            <div id="shape-selector">
+                <h3 class="h5">Choose Shape</h3>
+                <div id="shape-buttons">
+                    <button class="shape-btn" data-shape="sphere">
+                        <div class="shape-preview sphere-preview"></div>
+                        <span class="subhead">Sphere</span>
                     </button>
-                    <button data-shape="cube" class="control-btn p-2 rounded-md" aria-label="Cube">
-                        <img src="assets/shapes/cube.avif" width="32" height="32" alt="Cube icon" />
-                        <div class="shape-label">Cube</div>
+                    <button class="shape-btn" data-shape="cube">
+                        <div class="shape-preview cube-preview"></div>
+                        <span class="subhead">Cube</span>
                     </button>
-                    <button data-shape="cylinder" class="control-btn p-2 rounded-md" aria-label="Cylinder">
-                        <img src="assets/shapes/cylinder.avif" width="32" height="32" alt="Cylinder icon" />
-                        <div class="shape-label">Cylinder</div>
+                    <button class="shape-btn" data-shape="cylinder">
+                        <div class="shape-preview cylinder-preview"></div>
+                        <span class="subhead">Cylinder</span>
                     </button>
-                    <button data-shape="pyramid" class="control-btn p-2 rounded-md" aria-label="Pyramid">
-                        <img src="assets/shapes/pyramid.avif" width="32" height="32" alt="Pyramid icon" />
-                        <div class="shape-label">Pyramid</div>
+                    <button class="shape-btn" data-shape="pyramid">
+                        <div class="shape-preview pyramid-preview"></div>
+                        <span class="subhead">Pyramid</span>
                     </button>
-                    <button data-shape="torus" class="control-btn p-2 rounded-md" aria-label="Torus">
-                        <img src="assets/shapes/torus.avif" width="32" height="32" alt="Torus icon" />
-                        <div class="shape-label">Torus</div>
-                    </button>
-        </div>
-            </div>
-            <div id="layout-panel" class="control-panel">
-                <h3 class="card-title">How do you want to compare?</h3>
-                <div id="layout-selector" class="tabs">
-                    <button data-layout="horizontal" class="tab-btn active">Side by Side</button>
-                    <button data-layout="vertical" class="tab-btn">One on Top</button>
-                </div>
-            </div>
-            <div class="control-panel">
-                <h3 class="card-title">Base Unit Size</h3>
-                <div class="custom-stepper" id="base-unit-stepper">
-                    <button class="stepper-btn" id="base-unit-minus" aria-label="Decrease base unit size">-</button>
-                    <input type="number" class="stepper-value-input" id="base-unit-value" min="0.05" max="5" step="0.05" value="1.00" title="Base unit size (like 1, 2, 3...)" inputmode="decimal" placeholder="Base unit size" />
-                    <button class="stepper-btn" id="base-unit-plus" aria-label="Increase base unit size">+</button>
-        </div>
-                <input type="range" id="base-unit-slider" value="1" min="0.05" max="5" step="0.05" title="Base unit size">
-            </div>
-            <div class="control-panel">
-                <h3 class="card-title">Primary Value</h3>
-                <div class="color-row" id="primary-color-row">
-                    <button class="color-swatch" data-color="#818CF8" title="Pick this color"></button>
-                    <button class="color-swatch" data-color="#F472B6" title="Pick this color"></button>
-                    <button class="color-swatch" data-color="#34D399" title="Pick this color"></button>
-                    <button class="color-swatch" data-color="#FBBF24" title="Pick this color"></button>
-                    <button class="color-swatch" data-color="#60A5FA" title="Pick this color"></button>
-                    <div class="color-picker-wrapper">
-                        <input type="color" id="primary-color" value="#818CF8" title="Pick a color">
-                    </div>
-                </div>
-                <div class="custom-stepper" id="primary-value-stepper">
-                    <button class="stepper-btn" id="primary-value-minus" aria-label="Decrease primary value">-</button>
-                    <input type="number" class="stepper-value-input" id="primary-value-value" min="1" max="1000000" step="1" value="10" title="Primary value (how many shapes?)" inputmode="numeric" placeholder="Primary value" />
-                    <button class="stepper-btn" id="primary-value-plus" aria-label="Increase primary value">+</button>
-                </div>
-                <input type="range" id="primary-slider" value="10" min="1" max="10000" title="Primary value">
-            </div>
-            <div class="control-panel">
-                <div class="card-title-row">
-                    <h3 class="card-title">Compare with Another Group?</h3>
-                    <input type="checkbox" id="compare-checkbox" title="Show comparison" />
-                </div>
-                <div id="comparison-controls" class="hidden">
-                    <div class="color-row" id="comparison-color-row">
-                        <button class="color-swatch" data-color="#818CF8" title="Pick this color for the other group"></button>
-                        <button class="color-swatch" data-color="#F472B6" title="Pick this color for the other group"></button>
-                        <button class="color-swatch" data-color="#34D399" title="Pick this color for the other group"></button>
-                        <button class="color-swatch" data-color="#FBBF24" title="Pick this color for the other group"></button>
-                        <button class="color-swatch" data-color="#60A5FA" title="Pick this color for the other group"></button>
-                        <div class="color-picker-wrapper">
-                            <input type="color" id="comparison-color" value="#F472B6" title="Pick a color for the other group">
-                        </div>
-                    </div>
-                    <div class="custom-stepper" id="comparison-value-stepper">
-                        <button class="stepper-btn" id="comparison-value-minus" aria-label="Less shapes in the other group">-</button>
-                        <input type="number" class="stepper-value-input" id="comparison-value-value" min="1" max="1000000" step="1" value="50" title="How many in the other group?" inputmode="numeric" placeholder="How many?" />
-                        <button class="stepper-btn" id="comparison-value-plus" aria-label="More shapes in the other group">+</button>
-                    </div>
-                    <input type="range" id="comparison-slider" value="50" min="1" max="10000" title="How many in the other group?">
-                </div>
-            </div>
-            <!-- Zoom Control Panel -->
-            <div class="control-panel zoom-panel">
-                <div class="card-title-row">
-                    <h3 class="card-title">Zoom In & Out</h3>
-                    <button id="reset-zoom-btn" title="Reset zoom" class="reset-zoom-btn">
-                        <img src="assets/icons/dark/reset_dark.svg" alt="Reset zoom" width="20" height="20" />
+                    <button class="shape-btn" data-shape="torus">
+                        <div class="shape-preview torus-preview"></div>
+                        <span class="subhead">Torus</span>
                     </button>
                 </div>
-                <input type="range" id="zoom-slider" min="10" max="10000" value="30" step="1" title="Zoom in and out" class="flex-1">
+            </div>
+            
+            <div id="number-selector">
+                <h3 class="h5">Choose Quantity</h3>
+                <div id="number-slider-container">
+                    <input type="range" id="number-slider" min="1" max="100" value="5" aria-label="Quantity selector">
+                    <div id="number-display" class="h4">5</div>
+                </div>
+                <div id="preset-buttons">
+                    <button class="preset-btn subhead" data-value="1">1</button>
+                    <button class="preset-btn subhead" data-value="5">5</button>
+                    <button class="preset-btn subhead" data-value="10">10</button>
+                    <button class="preset-btn subhead" data-value="25">25</button>
+                    <button class="preset-btn subhead" data-value="50">50</button>
+                    <button class="preset-btn subhead" data-value="100">100</button>
+                </div>
+            </div>
+            
+            <div id="placement-controls">
+                <h3 class="h5">Place Objects</h3>
+                <div id="placement-buttons">
+                    <button id="place-group-a" class="placement-btn cta">Place Group A</button>
+                    <button id="place-group-b" class="placement-btn cta">Place Group B</button>
+                </div>
+            </div>
+            
+            <div id="action-controls">
+                <h3 class="h5">Actions</h3>
+                <div id="action-buttons">
+                    <button id="compare-btn" class="action-btn primary cta">Compare</button>
+                    <button id="clear-btn" class="action-btn secondary cta">Clear All</button>
+                    <button id="switch-btn" class="action-btn secondary cta">Switch Groups</button>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Add Babylon.js CDN -->
-    <script src="https://cdn.babylonjs.com/babylon.js"></script>
-    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-    <script src="main.js"></script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
